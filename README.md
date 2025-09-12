@@ -5,7 +5,7 @@
 Ce projet est la réalisation d'un site e-commerce pour une boutique de sneakers, dans le cadre du projet "Bootcamp Web" de l'Epitech Digital School.
 
 ## À propos du projet
-
+ttttt
 L'objectif est de construire un site e-commerce fonctionnel en partant de zéro, en suivant un cahier des charges précis. Le projet doit inclure la création de l'identité visuelle, le développement front-end, et la conception d'une base de données pour gérer les produits, utilisateurs et commandes.
 
 ### Stack Technique

@@ -7,3 +7,9 @@ with engine.connect() as conn:
     result = conn.execute(text("SELECT now()"))
     for row in result:
         print(row)
+
+#sudo service postgresql start
+#sudo service postgresql status
+
+#Lancer le shell sql
+#sudo -u postgres psql
