@@ -1,3 +1,4 @@
+// ---------- Generators & datasource ----------
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,14 +8,193 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+// ---------- Enums ----------
+enum Role {
+  customer
+  moderator
+  admin
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+// ---------- Catalog ----------
+model Brand {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique @db.VarChar(100)
+  logoUrl    String?   @db.VarChar(255)
+  createdAt  DateTime  @default(now())
+  products   Product[]
+}
+
+model Category {
+  id         Int         @id @default(autoincrement())
+  name       String      @db.VarChar(100)
+  slug       String?     @unique @db.VarChar(100)
+  parentId   Int?
+  parent     Category?   @relation("CategoryToSelf", fields: [parentId], references: [id], onDelete: SetNull)
+  children   Category[]  @relation("CategoryToSelf")
+  products   Product[]
+
+  @@index([parentId])
+}
+
+model Product {
+  id           Int              @id @default(autoincrement())
+  name         String           @db.VarChar(255)
+  brandId      Int?
+  brand        Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  categoryId   Int?
+  category     Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description  String?
+  basePrice    Decimal?         @db.Decimal(10, 2)
+  sku          String?          @unique @db.VarChar(50)
+  isActive     Boolean          @default(true)
+  scrapedFrom  String?          @db.VarChar(255)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  variants     ProductVariant[]
+  images       ProductImage[]
+
+  @@index([brandId])
+  @@index([categoryId])
+}
+
+model ProductVariant {
+  id             Int       @id @default(autoincrement())
+  productId      Int
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size           Decimal?  @db.Decimal(4, 1) // ex: 42.5 ; si besoin de "M/L", ajouter sizeLabel: String?
+  color          String?   @db.VarChar(50)
+  stockQuantity  Int       @default(0)
+  price          Decimal?  @db.Decimal(10, 2)
+  sku            String?   @unique @db.VarChar(50)
+  createdAt      DateTime  @default(now())
+  orderItems     OrderItem[]
+  cartItems      ShoppingCartItem[]
+
+  @@index([productId])
+}
+
+model ProductImage {
   id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  firstName    String?
-  lastName     String?
-  role         String   @default("customer") // admin | seller | customer
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  productId    Int
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl     String   @db.VarChar(500)
+  altText      String?  @db.VarChar(255)
+  isPrimary    Boolean  @default(false)
+  displayOrder Int      @default(0)
+
+  @@index([productId])
+  @@index([isPrimary, displayOrder])
+}
+
+// ---------- Users / Auth ----------
+model User {
+  id            Int           @id @default(autoincrement())
+  email         String        @unique @db.VarChar(255)
+  passwordHash  String        @db.VarChar(255)
+  firstName     String?       @db.VarChar(100)
+  lastName      String?       @db.VarChar(100)
+  role          Role          @default(customer)
+  isActive      Boolean       @default(true)
+  emailVerified Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  sessions      UserSession[]
+  orders        Order[]
+  cartItems     ShoppingCartItem[]
+
+  @@index([role])
+}
+
+model UserSession {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @db.VarChar(255)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@unique([tokenHash])
+}
+
+// (Optionnel) Permissions RBAC
+model Permission {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique @db.VarChar(100)
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  role         Role
+  permissionId Int
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([role, permissionId])
+}
+
+// ---------- Orders ----------
+model Order {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  user            User           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orderNumber     String         @unique @db.VarChar(50)
+  status          OrderStatus    @default(pending)
+  totalAmount     Decimal?       @db.Decimal(10, 2)
+  shippingAddress String?
+  billingAddress  String?
+  paymentMethod   String?        @db.VarChar(50)
+  paymentStatus   PaymentStatus  @default(pending)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  items           OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id               Int             @id @default(autoincrement())
+  orderId          Int
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariantId Int
+  productVariant   ProductVariant  @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
+  quantity         Int
+  unitPrice        Decimal         @db.Decimal(10, 2)
+  totalPrice       Decimal         @db.Decimal(10, 2)
+  createdAt        DateTime        @default(now())
+
+  @@index([orderId])
+  @@index([productVariantId])
+  @@unique([orderId, productVariantId])
+}
+
+// ---------- Cart ----------
+model ShoppingCartItem {
+  id               Int             @id @default(autoincrement())
+  userId           Int
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productVariantId Int
+  productVariant   ProductVariant  @relation(fields: [productVariantId], references: [id], onDelete: Restrict)
+  quantity         Int
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@unique([userId, productVariantId])
+  @@index([userId])
+  @@index([productVariantId])
 }
