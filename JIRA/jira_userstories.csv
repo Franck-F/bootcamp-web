@@ -1,0 +1,59 @@
+﻿Titre,Description
+US1.1 - Environnement de développement,"[Epic: Initialisation du projet] [Story Points: 3]
+En tant que développeur, lorsque je configure mon environnement (Node.js, PostgreSQL, Git, VSCode), alors je dois pouvoir installer et exécuter le projet localement sans erreurs."
+US1.2 - Dépôt Git & organisation,"[Epic: Initialisation du projet] [Story Points: 3]
+En tant que développeur, lorsque je crée le dépôt Git et la structure du projet (frontend, backend, scripts, docs), alors l’équipe doit pouvoir cloner le repo et contribuer facilement."
+US1.3 - CI/CD basique,"[Epic: Initialisation du projet] [Story Points: 5]
+En tant que développeur, lorsque je pousse du code sur la branche principale, alors un pipeline doit vérifier le build et les tests unitaires."
+US1.4 - Déploiement initial,"[Epic: Initialisation du projet] [Story Points: 5]
+En tant que membre de l’équipe, lorsque je déploie la première version du projet, alors je dois obtenir une URL publique (frontend + backend) accessible."
+US2.1 - Conception du schéma,"[Epic: Base de données] [Story Points: 5]
+En tant que développeur backend, lorsque je modélise les produits, variantes, images, utilisateurs, commandes et paniers, alors la base doit contenir toutes les tables nécessaires avec contraintes et clés."
+US2.2 - Migrations & seed,"[Epic: Base de données] [Story Points: 3]
+En tant que développeur backend, lorsque je lance les migrations, alors la base doit être créée avec des données de test (produits, utilisateurs)."
+US2.3 - Optimisation & index,"[Epic: Base de données] [Story Points: 3]
+En tant que développeur backend, lorsque je fais une recherche produit, alors les résultats doivent s’afficher rapidement grâce aux index."
+US3.1 - Script de scraping,"[Epic: Scraping & Ingestion] [Story Points: 5]
+En tant que développeur data, lorsque je lance le scraper, alors je dois récupérer au moins 50 produits structurés (nom, prix, taille, image)."
+US3.2 - Nettoyage & normalisation,"[Epic: Scraping & Ingestion] [Story Points: 3]
+En tant que développeur backend, lorsque j’insère les données scrapées en base, alors elles doivent être validées, nettoyées et sans doublons."
+US3.3 - Automatisation du scraping,"[Epic: Scraping & Ingestion] [Story Points: 5]
+En tant que membre de l’équipe, lorsque le scraping s’exécute chaque jour automatiquement, alors la base doit être mise à jour avec les nouveaux produits."
+US4.1 - API produits,"[Epic: Catalogue & Recherche] [Story Points: 5]
+En tant que client, lorsque je consulte l’API catalogue, alors je dois voir une liste paginée avec filtres (marque, catégorie, taille, prix)."
+US4.2 - Page catalogue frontend,"[Epic: Catalogue & Recherche] [Story Points: 5]
+En tant que client, lorsque j’applique une recherche ou un filtre, alors la liste des produits doit se mettre à jour dynamiquement."
+US4.3 - Fiche produit,"[Epic: Catalogue & Recherche] [Story Points: 3]
+En tant que client, lorsque je clique sur un produit, alors je dois voir ses détails, ses variantes et ses images."
+US5.1 - Gestion panier côté API,"[Epic: Panier & Checkout] [Story Points: 5]
+En tant que client, lorsque j’ajoute un produit au panier, alors il doit être sauvegardé en base et refléter quantité et prix."
+US5.2 - Page panier frontend,"[Epic: Panier & Checkout] [Story Points: 5]
+En tant que client, lorsque je consulte mon panier, alors je dois voir mes articles, le total et pouvoir modifier/supprimer un produit."
+US5.3 - Checkout & confirmation,"[Epic: Panier & Checkout] [Story Points: 5]
+En tant que client, lorsque je valide mon panier, alors une commande doit être créée avec un paiement fictif et un récapitulatif affiché."
+US6.1 - Inscription / Connexion,"[Epic: Authentification & Rôles] [Story Points: 5]
+En tant qu’utilisateur, lorsque je crée un compte ou me connecte, alors je dois accéder au site avec un compte sécurisé (mot de passe hashé, JWT)."
+US6.2 - Gestion des rôles,"[Epic: Authentification & Rôles] [Story Points: 3]
+En tant qu’administrateur, lorsque j’accède à l’espace admin, alors seuls les rôles autorisés doivent pouvoir y accéder."
+US6.3 - Sessions & déconnexion,"[Epic: Authentification & Rôles] [Story Points: 3]
+En tant qu’utilisateur, lorsque je me déconnecte, alors mes tokens et ma session doivent être invalidés."
+US7.1 - CRUD Produits,"[Epic: Administration] [Story Points: 5]
+En tant qu’administrateur, lorsque je crée, édite ou supprime un produit, alors il doit apparaître correctement dans le catalogue public."
+US7.2 - Gestion des stocks,"[Epic: Administration] [Story Points: 3]
+En tant qu’administrateur, lorsque je mets à jour le stock d’un produit, alors les changements doivent être visibles côté client."
+US7.3 - Suivi des commandes,"[Epic: Administration] [Story Points: 3]
+En tant qu’administrateur, lorsque je change le statut d’une commande (confirmée, expédiée, annulée), alors le client doit voir cette mise à jour."
+US8.1 - Sécurisation API,"[Epic: Sécurité & RGPD] [Story Points: 3]
+En tant que développeur, lorsque je consulte les headers HTTP, alors je dois voir Helmet, CSP, HSTS et protections XSS/CSRF activées."
+US8.2 - Consentement cookies,"[Epic: Sécurité & RGPD] [Story Points: 3]
+En tant qu’utilisateur, lorsque je visite le site pour la première fois, alors je dois accepter ou refuser les cookies non essentiels."
+US8.3 - Gestion des données personnelles,"[Epic: Sécurité & RGPD] [Story Points: 5]
+En tant qu’utilisateur, lorsque je demande l’export ou la suppression de mes données, alors je dois recevoir mes données en JSON ou voir mon compte supprimé."
+US8.4 - Mentions légales et CGU,"[Epic: Sécurité & RGPD] [Story Points: 3]
+En tant qu’utilisateur, lorsque je consulte le site, alors je dois trouver les mentions légales, la politique de confidentialité et les CGU/CGV."
+US9.1 - Cache Redis,"[Epic: Performance & Observabilité] [Story Points: 3]
+En tant que client, lorsque je consulte plusieurs fois une fiche produit, alors la réponse doit être servie plus rapidement via le cache."
+US9.2 - Monitoring des performances,"[Epic: Performance & Observabilité] [Story Points: 3]
+En tant qu’équipe technique, lorsque j’analyse le site avec Lighthouse, alors je dois obtenir un LCP inférieur à 2,5s sur mobile simulé."
+US9.3 - Logs & suivi des erreurs,"[Epic: Performance & Observabilité] [Story Points: 3]
+En tant que développeur, lorsque une erreur survient, alors je dois pouvoir la retrouver dans les logs avec un identifiant de requête unique."
