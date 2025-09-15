@@ -135,7 +135,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2024 SneakPeak. Tous droits réservés.</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} SneakPeak. Tous droits réservés.</p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span>Paiement sécurisé</span>
             <div className="flex gap-2">
