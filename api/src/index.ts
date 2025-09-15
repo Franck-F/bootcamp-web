@@ -14,6 +14,7 @@ import rgpdRouter from "./modules/rgpd/router";
 import catalogRouter from "./modules/catalog/router";
 import cartRouter from "./modules/cart/router";
 import ordersRouter from "./modules/orders/router";
+import adminRouter from "./modules/admin/router";
 
 const app = express();
 
@@ -49,6 +50,12 @@ app.use("/api/rgpd", rgpdRouter);
 
 // Error handler (last)
 app.use(errorHandler);
+
+
+
+// ADMIN
+app.use("/api/admin", adminRouter);
+
 
 const PORT = Number(process.env.PORT ?? 4000);
 app.listen(PORT, () => console.log(`API up on :${PORT}`));

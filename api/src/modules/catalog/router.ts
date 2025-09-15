@@ -53,4 +53,18 @@ catalog.get("/products/:id", async (req, res) => {
     res.json(p);
 });
 
+catalog.get("/brands", async (_req, res) => {
+    const list = await prisma.brand.findMany({ orderBy: { name: "asc" } });
+    res.json(list);
+});
+
+catalog.get("/categories", async (_req, res) => {
+    const list = await prisma.category.findMany({
+        orderBy: { name: "asc" },
+        include: { children: true },
+    });
+    res.json(list);
+});
+
+
 export default catalog;

@@ -1,5 +1,8 @@
 * { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-a { text-decoration: none; color: #0a58ca; }
-a.active { font-weight: 600; }
-button { cursor: pointer; }
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; margin: 0; color: #222; }
+a { color: #0b5; }
+a.btn, button { background:#111; color:#fff; border:0; padding:8px 10px; border-radius:6px; cursor:pointer; }
+button:disabled { opacity: .6; cursor: not-allowed; }
+input, select, textarea { padding:8px; border:1px solid #ddd; border-radius:6px; }
+header a, header .active { text-decoration:none; }
+header .active { font-weight: 700; }

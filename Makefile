@@ -1,15 +1,18 @@
 # Makefile (racine)
 SHELL := bash
-API_DIR := api
-PORT ?= 4000
-API_URL := http://localhost:$(PORT)
+
+# ====== Config ======
+API_DIR    := api
+WEB_DIR    := web
+PORT      ?= 4000
+API_URL    := http://localhost:$(PORT)
 SCHEMA_REL := prisma/schema.prisma
 
 .DEFAULT_GOAL := help
 
-## ----- AIDE -----
+# ====== AIDE ======
 .PHONY: help
-help: ## Liste des commandes
+help: ## Liste des commandes disponibles
 	@echo "Commandes :"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' Makefile | sed -E 's/:.*?## / - /'
 
@@ -20,7 +23,7 @@ doctor: ## Vérifie node/npm/psql/prisma
 	@echo "psql: " && (psql --version || echo 'psql non trouvé')
 	@cd $(API_DIR) && npx prisma -v
 
-## ----- INSTALL & ENV -----
+# ====== INSTALL & ENV ======
 .PHONY: install
 install: ## Installe deps backend
 	@cd $(API_DIR) && (npm ci || npm install)
@@ -29,9 +32,9 @@ install: ## Installe deps backend
 env: ## Crée .env depuis .env.example si absent
 	@test -f $(API_DIR)/.env && echo ".env existe déjà" || (cp $(API_DIR)/.env.example $(API_DIR)/.env && echo "Créé $(API_DIR)/.env")
 
-## ----- PRISMA -----
+# ====== PRISMA ======
 .PHONY: prisma-generate
-prisma-generate: ## Génère client Prisma
+prisma-generate: ## Génère Prisma Client
 	@cd $(API_DIR) && npx prisma generate --schema=$(SCHEMA_REL)
 
 .PHONY: migrate
@@ -46,7 +49,7 @@ prisma-reset: ## Reset BDD (destructive)
 studio: ## Prisma Studio
 	@cd $(API_DIR) && npx prisma studio --schema=$(SCHEMA_REL)
 
-## ----- BUILD & RUN -----
+# ====== BUILD & RUN (API) ======
 .PHONY: build
 build: ## Compile TS -> dist
 	@cd $(API_DIR) && npx tsc -p .
@@ -56,14 +59,14 @@ start: build ## Démarre app compilée
 	@node $(API_DIR)/dist/index.js
 
 .PHONY: dev
-dev: ## Dev (hot reload)
+dev: ## Dev API (hot reload)
 	@cd $(API_DIR) && npx ts-node-dev --respawn --transpile-only src/index.ts
 
 .PHONY: seed
 seed: ## Seed TypeScript
 	@cd $(API_DIR) && npx ts-node prisma/seed.ts
 
-## ----- HEALTH -----
+# ====== HEALTH ======
 .PHONY: health
 health: ## Ping /health
 	@curl -sS $(API_URL)/health || true; echo
@@ -72,7 +75,7 @@ health: ## Ping /health
 db-health: ## Ping /db/health
 	@curl -sS $(API_URL)/db/health || true; echo
 
-## ----- OUTILS -----
+# ====== OUTILS ======
 .PHONY: clean
 clean: ## Supprime dist et node_modules backend
 	@rm -rf $(API_DIR)/dist $(API_DIR)/node_modules && echo "Clean OK"
@@ -81,23 +84,20 @@ clean: ## Supprime dist et node_modules backend
 check-schema: ## Vérifie l'existence du schema.prisma
 	@test -f $(API_DIR)/$(SCHEMA_REL) && echo "OK: $(API_DIR)/$(SCHEMA_REL)" || (echo "Manquant: $(API_DIR)/$(SCHEMA_REL)"; exit 1)
 
-## ----- RGPD: dépendances -----
+# ====== RGPD: dépendances ======
 .PHONY: rgpd-deps
 rgpd-deps: ## Installe cookie-parser (+ types)
 	@npm -C $(API_DIR) i cookie-parser
 	@npm -C $(API_DIR) i -D @types/cookie-parser
 
-
 # ====== WEB (React/Vite) ======
-WEB_DIR := web
-NPM_W   := npm -C $(WEB_DIR)
+NPM_W := npm -C $(WEB_DIR)
 
 .PHONY: web-install web-dev web-build web-preview web-clean dev-all
-
 web-install: ## Installe les dépendances du front
 	$(NPM_W) install
 
-web-dev: ## Lance le front en mode dev (http://localhost:5173)
+web-dev: ## Lance le front en mode dev (http://localhost:5173 ou suivant)
 	$(NPM_W) run dev
 
 web-build: ## Build de production du front
