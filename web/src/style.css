@@ -1,0 +1,5 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+a { text-decoration: none; color: #0a58ca; }
+a.active { font-weight: 600; }
+button { cursor: pointer; }
