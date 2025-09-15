@@ -116,6 +116,10 @@ model User {
   sessions      UserSession[]
   orders        Order[]
   cartItems     ShoppingCartItem[]
+  consent     Consent?
+  requests    DataRequest[]
+  auditLogs   AuditLog[]
+
 
   @@index([role])
 }
@@ -198,3 +202,64 @@ model ShoppingCartItem {
   @@index([userId])
   @@index([productVariantId])
 }
+
+// ---------- RGPD Enums ----------
+enum DataRequestType {
+  ACCESS        // droit d'accès (export)
+  RECTIFY       // rectification
+  ERASURE       // effacement
+  PORTABILITY   // portabilité (format structuré)
+  RESTRICT      // limitation du traitement
+  OBJECT_MARKET // opposition marketing
+}
+
+enum RequestStatus {
+  PENDING
+  DONE
+  REJECTED
+}
+
+// ---------- RGPD Models ----------
+model Consent {
+  id              Int       @id @default(autoincrement())
+  userId          Int?      @unique
+  analytics       Boolean   @default(false)
+  marketing       Boolean   @default(false)
+  personalization Boolean   @default(false)
+  version         String    @default("v1")
+  ip              String?
+  userAgent       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User?     @relation(fields: [userId], references: [id])
+}
+
+model DataRequest {
+  id          Int             @id @default(autoincrement())
+  userId      Int
+  type        DataRequestType
+  status      RequestStatus   @default(PENDING)
+  payload     Json?
+  createdAt   DateTime        @default(now())
+  processedAt DateTime?
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        Int       @id @default(autoincrement())
+  userId    Int?
+  action    String
+  details   Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+

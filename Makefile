@@ -1,11 +1,8 @@
 # Makefile (racine)
-
 SHELL := bash
 API_DIR := api
 PORT ?= 4000
 API_URL := http://localhost:$(PORT)
-
-# Important: chemin RELATIF DEPUIS api/
 SCHEMA_REL := prisma/schema.prisma
 
 .DEFAULT_GOAL := help
@@ -83,3 +80,34 @@ clean: ## Supprime dist et node_modules backend
 .PHONY: check-schema
 check-schema: ## Vérifie l'existence du schema.prisma
 	@test -f $(API_DIR)/$(SCHEMA_REL) && echo "OK: $(API_DIR)/$(SCHEMA_REL)" || (echo "Manquant: $(API_DIR)/$(SCHEMA_REL)"; exit 1)
+
+## ----- RGPD: dépendances -----
+.PHONY: rgpd-deps
+rgpd-deps: ## Installe cookie-parser (+ types)
+	@npm -C $(API_DIR) i cookie-parser
+	@npm -C $(API_DIR) i -D @types/cookie-parser
+
+
+# ====== WEB (React/Vite) ======
+WEB_DIR := web
+NPM_W   := npm -C $(WEB_DIR)
+
+.PHONY: web-install web-dev web-build web-preview web-clean dev-all
+
+web-install: ## Installe les dépendances du front
+	$(NPM_W) install
+
+web-dev: ## Lance le front en mode dev (http://localhost:5173)
+	$(NPM_W) run dev
+
+web-build: ## Build de production du front
+	$(NPM_W) run build
+
+web-preview: ## Prévisualise le build (serveur statique)
+	$(NPM_W) run preview
+
+web-clean: ## Supprime node_modules et dist du front
+	rm -rf $(WEB_DIR)/node_modules $(WEB_DIR)/dist && echo "Front clean OK"
+
+dev-all: ## Lance API + Front en parallèle
+	@$(MAKE) -j2 dev web-dev

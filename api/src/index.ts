@@ -1,33 +1,48 @@
 import "dotenv/config";
 import express from "express";
-import helmet from "helmet";
 import cors from "cors";
+import helmet from "helmet";
 import morgan from "morgan";
-import { PrismaClient } from "@prisma/client";
+import cookieParser from "cookie-parser";
+import { prisma } from "./prisma";
+
+import rgpdRouter from "./modules/rgpd/router";
+import { devAuth } from "./middlewares/devAuth"; // DEV only
 
 const app = express();
-const prisma = new PrismaClient();
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+app.use(cookieParser());
+app.use(
+    helmet({
+        referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                "script-src": ["'self'"], // inject GA/Meta UNIQUEMENT après consentement (front)
+            },
+        },
+    })
+);
+app.use(cors({ origin: true, credentials: true }));
 app.use(morgan("dev"));
 
-app.get("/health", (_req, res) => {
-    res.json({ status: "ok" });
-});
-
+// Health endpoints (utiles pour Makefile)
+app.get("/health", (_req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 app.get("/db/health", async (_req, res) => {
     try {
         await prisma.$queryRaw`SELECT 1`;
-        res.json({ db: "ok" });
-    } catch (err: any) {
-        console.error(err);
-        res.status(500).json({ db: "down", error: String(err) });
+        res.json({ ok: true });
+    } catch (e: any) {
+        res.status(500).json({ ok: false, error: String(e?.message || e) });
     }
 });
 
-const port = Number(process.env.PORT || 4000);
-app.listen(port, () => {
-    console.log(`🚀 API ready on http://localhost:${port}`);
-});
+// DEV: pose req.user si variable set
+app.use(devAuth);
+
+// Routes RGPD
+app.use("/api/rgpd", rgpdRouter);
+
+const PORT = Number(process.env.PORT ?? 4000);
+app.listen(PORT, () => console.log(`API up on :${PORT}`));
