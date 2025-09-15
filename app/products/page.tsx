@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/footer"
 export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-background">
-       
+      <Header />
       <main>
         <ProductCatalog />
       </main>
