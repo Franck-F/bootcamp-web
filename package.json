@@ -1,4 +1,6 @@
 {
+  "name": "bootcamp-web",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "npm --prefix api run dev",
@@ -7,10 +9,7 @@
     "migrate": "npm --prefix api run prisma:migrate",
     "seed": "npm --prefix api run seed",
     "prisma:generate": "npm --prefix api run prisma:generate"
-  }
-}
-
-{
+  },
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "bcryptjs": "^3.0.2",
