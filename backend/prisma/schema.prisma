@@ -1,0 +1,398 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model brands {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  logo_url   String?
+  created_at DateTime   @default(now())
+  products   products[]
+
+  @@map("brands")
+}
+
+model categories {
+  id         Int                   @id @default(autoincrement())
+  name       String                @unique
+  sku        String?               @unique
+  created_at DateTime              @default(now())
+  products   products[]
+  tags       categories_products[]
+
+  @@map("categories")
+}
+
+model products {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  brand_id    Int
+  category_id Int
+  sku         String?  @unique
+  created_at  DateTime @default(now())
+
+  brand    brands                @relation(fields: [brand_id], references: [id])
+  category categories            @relation(fields: [category_id], references: [id])
+  variants variants[]
+  images   product_images[]
+  tags     categories_products[]
+
+  @@map("products")
+}
+
+model variants {
+  id         Int      @id @default(autoincrement())
+  product_id Int
+  size       String?
+  color      String?
+  price      Decimal  @db.Decimal(10, 2)
+  stock      Int      @default(0)
+  created_at DateTime @default(now())
+
+  product        products         @relation(fields: [product_id], references: [id])
+  order_items    order_items[]
+  shopping_carts shopping_carts[]
+
+  @@map("variants")
+}
+
+model product_images {
+  id            Int     @id @default(autoincrement())
+  product_id    Int
+  image_url     String
+  alt_text      String?
+  is_primary    Boolean @default(false)
+  display_order Int     @default(0)
+
+  product products @relation(fields: [product_id], references: [id])
+
+  @@map("product_images")
+}
+
+model categories_products {
+  category_id Int
+  product_id  Int
+
+  category categories @relation(fields: [category_id], references: [id])
+  product  products   @relation(fields: [product_id], references: [id])
+
+  @@id([category_id, product_id])
+  @@map("categories_products")
+}
+
+/// 👤 Utilisateurs de la plateforme
+model users {
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  password_hash  String
+  name           String?
+  role           roles    @default(customer)
+  is_active      Boolean  @default(true)
+  email_verified Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  /// Relations
+  sessions       user_sessions[]
+  orders         orders[]
+  shopping_carts shopping_carts[]
+}
+
+/// 🔐 Sessions utilisateur (ex: token de connexion)
+model user_sessions {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token_hash String?
+  created_at DateTime @default(now())
+
+  user users @relation(fields: [user_id], references: [id])
+}
+
+/// 🛂 Liste des permissions disponibles
+model permissions {
+  id          Int                @id @default(autoincrement())
+  name        String             @unique
+  description String?
+  roles       role_permissions[]
+}
+
+/// 🔗 Association entre rôles et permissions
+model role_permissions {
+  role          roles
+  permission_id Int
+
+  permission permissions @relation(fields: [permission_id], references: [id])
+
+  @@id([role, permission_id])
+}
+
+/// 🎭 Enum des rôles utilisateur
+enum roles {
+  customer
+  moderator
+  admin
+}
+
+/// 🧾 Commandes passées par les utilisateurs
+model orders {
+  id               Int            @id @default(autoincrement())
+  user_id          Int
+  order_number     String         @unique
+  status           order_status   @default(pending)
+  total_amount     Decimal        @db.Decimal(10, 2)
+  shipping_address String?
+  payment_method   String?
+  payment_status   payment_status @default(pending)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  /// Relations
+  user  users         @relation(fields: [user_id], references: [id])
+  items order_items[]
+}
+
+/// 📦 Articles contenus dans une commande
+model order_items {
+  id                 Int      @id @default(autoincrement())
+  order_id           Int
+  product_variant_id Int
+  quantity           Int
+  unit_price         Decimal  @db.Decimal(10, 2)
+  created_at         DateTime @default(now())
+
+  /// Relations
+  order   orders   @relation(fields: [order_id], references: [id])
+  variant variants @relation(fields: [product_variant_id], references: [id])
+}
+
+/// 🛒 Contenu du panier d’un utilisateur
+model shopping_carts {
+  id                 Int      @id @default(autoincrement())
+  user_id            Int
+  product_variant_id Int
+  quantity           Int
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  /// Relations
+  user    users    @relation(fields: [user_id], references: [id])
+  variant variants @relation(fields: [product_variant_id], references: [id])
+}
+
+/// 📌 Enum des statuts de commande
+enum order_status {
+  pending
+  shipped
+  delivered
+  canceled
+}
+
+/// 💳 Enum des statuts de paiement
+enum payment_status {
+  pending
+  failed
+  refunded
+}
+
+/// 🧾 Commandes passées par les utilisateurs
+model orders {
+  id               Int            @id @default(autoincrement())
+  user_id          Int
+  order_number     String         @unique /// Numéro unique de commande
+  status           order_status   @default(pending) /// État de la commande
+  total_amount     Decimal        @db.Decimal(10,2) /// Montant total
+  shipping_address String?        /// Adresse de livraison
+  billing_address  String?        /// Adresse de facturation
+  payment_method   String?        /// Méthode de paiement (ex: carte, PayPal)
+  payment_status   payment_status @default(pending) /// État du paiement
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  /// Relations
+  user             users          @relation(fields: [user_id], references: [id])
+  items            order_items[]
+}
+
+/// 📦 Articles contenus dans une commande
+model order_items {
+  id                 Int       @id @default(autoincrement())
+  order_id           Int
+  product_variant_id Int
+  quantity           Int       /// Quantité commandée
+  total_price        Decimal   @db.Decimal(10,2) /// Prix total pour cette ligne
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  order              orders    @relation(fields: [order_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+}
+
+/// 🛒 Contenu du panier d’un utilisateur
+model shopping_carts {
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  product_variant_id Int
+  quantity           Int       /// Quantité dans le panier
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  user               users     @relation(fields: [user_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+
+  @@unique([user_id, product_variant_id]) /// Un seul produit par utilisateur dans le panier
+}
+
+/// 📌 Enum des statuts de commande
+enum order_status {
+  pending
+  completed
+  cancelled
+}
+
+/// 💳 Enum des statuts de paiement
+enum payment_status {
+  pending
+  paid
+  failed
+  refunded
+}
+
+/// 🧾 Commandes passées par les utilisateurs
+model orders {
+  id               Int            @id @default(autoincrement())
+  user_id          Int
+  order_number     String         @unique /// Numéro unique de commande
+  status           order_status   @default(pending) /// État de la commande
+  total_amount     Decimal        @db.Decimal(10,2) /// Montant total
+  shipping_address String?        /// Adresse de livraison
+  billing_address  String?        /// Adresse de facturation
+  payment_method   String?        /// Méthode de paiement (ex: carte, PayPal)
+  payment_status   payment_status @default(pending) /// État du paiement
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  /// Relations
+  user             users          @relation(fields: [user_id], references: [id])
+  items            order_items[]
+}
+
+/// 📦 Articles contenus dans une commande
+model order_items {
+  id                 Int       @id @default(autoincrement())
+  order_id           Int
+  product_variant_id Int
+  quantity           Int       /// Quantité commandée
+  total_price        Decimal   @db.Decimal(10,2) /// Prix total pour cette ligne
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  order              orders    @relation(fields: [order_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+}
+
+/// 🛒 Contenu du panier d’un utilisateur
+model shopping_carts {
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  product_variant_id Int
+  quantity           Int       /// Quantité dans le panier
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  user               users     @relation(fields: [user_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+
+  @@unique([user_id, product_variant_id]) /// Un seul produit par utilisateur dans le panier
+}
+
+/// 📌 Enum des statuts de commande
+enum order_status {
+  pending
+  completed
+  cancelled
+}
+
+/// 💳 Enum des statuts de paiement
+enum payment_status {
+  pending
+  paid
+  failed
+  refunded
+}
+
+/// 🧾 Commandes passées par les utilisateurs
+model orders {
+  id               Int            @id @default(autoincrement())
+  user_id          Int
+  status           order_status   @default(pending) /// État de la commande
+  total_amount     Decimal        @db.Decimal(10,2) /// Montant total
+  shipping_address String?        /// Adresse de livraison
+  billing_address  String?        /// Adresse de facturation
+  payment_method   String?        /// Méthode de paiement
+  payment_status   payment_status @default(pending) /// État du paiement
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+
+  /// Relations
+  user             users          @relation(fields: [user_id], references: [id])
+  items            order_items[]
+}
+
+/// 📦 Articles contenus dans une commande
+model order_items {
+  id                 Int       @id @default(autoincrement())
+  order_id           Int
+  product_variant_id Int
+  quantity           Int
+  unit_price         Decimal   @db.Decimal(10,2) /// Prix unitaire
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  order              orders    @relation(fields: [order_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+}
+
+/// 🛒 Contenu du panier d’un utilisateur
+model shopping_carts {
+  id                 Int       @id @default(autoincrement())
+  user_id            Int
+  product_variant_id Int
+  quantity           Int
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  /// Relations
+  user               users     @relation(fields: [user_id], references: [id])
+  variant            variants  @relation(fields: [product_variant_id], references: [id])
+
+  @@unique([user_id, product_variant_id]) /// Un seul produit par utilisateur dans le panier
+}
+
+/// 📌 Enum des statuts de commande
+enum order_status {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+/// 💳 Enum des statuts de paiement
+enum payment_status {
+  pending
+  paid
+  failed
+  refunded
+}
