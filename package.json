@@ -1,4 +1,16 @@
 {
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix api run dev",
+    "build": "npm --prefix api run build",
+    "start": "npm --prefix api run start",
+    "migrate": "npm --prefix api run prisma:migrate",
+    "seed": "npm --prefix api run seed",
+    "prisma:generate": "npm --prefix api run prisma:generate"
+  }
+}
+
+{
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "bcryptjs": "^3.0.2",
