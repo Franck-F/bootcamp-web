@@ -13,7 +13,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   hasRole: (role: User["role"]) => boolean
-}
+}     
+
+//teststststststs 
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
