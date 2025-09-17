@@ -1,78 +1,30 @@
-# Projet Bootcamp Web - E-commerce de Sneakers
+# Ecommerce sneaker store
 
-[![](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+*Automatically synced with your [v0.app](https://v0.app) deployments*
 
-Ce projet est la réalisation d'un site e-commerce pour une boutique de sneakers, dans le cadre du projet "Bootcamp Web" de l'Epitech Digital School.
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/franck-dilane1fambou-1168s-projects/v0-ecommerce-sneaker-store)
+[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/95bmtDzdoaS)
 
-## À propos du projet
-ttttt
-L'objectif est de construire un site e-commerce fonctionnel en partant de zéro, en suivant un cahier des charges précis. Le projet doit inclure la création de l'identité visuelle, le développement front-end, et la conception d'une base de données pour gérer les produits, utilisateurs et commandes.
+## Overview
 
-### Stack Technique
+This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
+Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
 
-*   **Front-end :** Le langage est au choix, mais **ReactJS avec Material-UI** est recommandé.
-*   **Back-end / Base de données :** Aucune base de données n'est fournie. Le développeur doit la **concevoir, l'intégrer et la peupler**.
+## Deployment
 
-## Fonctionnalités Requises
+Your project is live at:
 
-Le site doit implémenter les modules suivants :
+**[https://vercel.com/franck-dilane1fambou-1168s-projects/v0-ecommerce-sneaker-store](https://vercel.com/franck-dilane1fambou-1168s-projects/v0-ecommerce-sneaker-store)**
 
-1.  **Gestion des stocks :**
-    *   Création, modification, suppression et consultation des produits.
-    *   Mise à jour en temps réel des quantités disponibles.
-    *   Gestion des tailles et catégories (enfants, hommes, femmes).
+## Build your app
 
-2.  **Gestion des rôles et des droits :**
-    *   Profil **Administrateur** : Vision globale, gestion des utilisateurs.
-    *   Profil **Vendeur** : Gestion des stocks et des commandes.
-    *   Profil **Client** : Parcours d'achat.
+Continue building your app on:
 
-3.  **Processus d'achat complet :**
-    *   Mise au panier.
-    *   Validation de la commande.
-    *   Système de paiement (fictif).
-    *   Confirmation de commande et suivi (simulation d'email).
+**[https://v0.app/chat/projects/95bmtDzdoaS](https://v0.app/chat/projects/95bmtDzdoaS)**
 
-4.  **Interface Utilisateur (UI/UX) :**
-    *   Expérience ergonomique, fluide et visuellement attractive.
-    *   Navigation intuitive et respect des bonnes pratiques d'accessibilité.
+## How It Works
 
-5.  **Conformité RGPD et Sécurité :**
-    *   Bandeau de consentement pour les cookies.
-    *   Politique de confidentialité claire.
-    *   Sécurité des données (gestion des sessions, formulaires sécurisés).
-
-## Démarrage
-
-Pour obtenir une copie locale et la faire fonctionner, suivez ces étapes.
-
-### Prérequis
-
-*   npm
-    ```sh
-    npm install npm@latest -g
-    ```
-
-### Installation
-
-1.  Clonez le dépôt
-    ```sh
-    git clone https://github.com/Franck-F/bootcamp-web.git
-    ```
-2.  Installez les paquets NPM
-    ```sh
-    npm install
-    ```
-3.  Configurez vos variables d'environnement dans un fichier `.env`
-    ```
-    # Exemple
-    DB_HOST = 'localhost'
-    DB_USER = 'root'
-    DB_PASS = 'password'
-    ```
-
-## Licence
-
-Distribué sous la licence MIT. Voir le fichier `LICENSE` pour plus d'informations.
-
-Lien du projet : [https://github.com/Franck-F/bootcamp-web](https://github.com/Franck-F/bootcamp-web)
+1. Create and modify your project using [v0.app](https://v0.app)
+2. Deploy your chats from the v0 interface
+3. Changes are automatically pushed to this repository
+4. Vercel deploys the latest version from this repository
