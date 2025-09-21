@@ -1,275 +1,198 @@
-# 🛒 Sneakers Store - E-commerce Moderne
+# 🚀 SneakPeak - E-commerce de Sneakers Moderne
 
-Un site e-commerce ultra moderne avec gestion de stock avancée, développé avec Next.js, TypeScript, Prisma et PostgreSQL.
+Un site e-commerce moderne et professionnel pour une boutique de sneakers, développé avec Next.js 14, TypeScript, et Prisma.
 
 ## ✨ Fonctionnalités
 
-### 🛍️ E-commerce
-- **Catalogue de produits** avec filtres avancés et recherche
-- **Gestion des stocks** en temps réel avec tailles et catégories
-- **Panier intelligent** avec réservation de stock
+### 🛍️ **E-commerce Complet**
+- **Catalogue de produits** avec filtres avancés (catégorie, marque, prix, taille)
+- **Recherche intelligente** avec autocomplétion en temps réel
+- **Pages dédiées** : Homme, Femme, Enfant, Nouveautés, Soldes
+- **Panier moderne** avec gestion des variantes (taille, couleur)
 - **Processus de commande** complet avec paiement fictif
-- **Gestion des commandes** avec suivi des statuts
+- **Suivi des commandes** et historique
 
-### 👥 Gestion des utilisateurs
-- **Système d'authentification** avec NextAuth.js
-- **Trois rôles** : Administrateur, Vendeur, Client
-- **Interfaces adaptées** selon les permissions
-- **Gestion des profils** et adresses
+### 👥 **Gestion des Utilisateurs**
+- **Authentification sécurisée** avec NextAuth.js
+- **3 rôles** : Administrateur, Vendeur, Client
+- **Profils utilisateurs** avec gestion des informations
+- **Système de permissions** granulaire
 
-### 🏪 Administration
-- **Tableau de bord** avec statistiques en temps réel
+### 📊 **Administration Avancée**
+- **Backoffice moderne** pour la gestion des stocks
+- **Tableau de bord** avec KPIs en temps réel
 - **Gestion des produits** (CRUD complet)
-- **Gestion des stocks** avec alertes de rupture
-- **Suivi des commandes** et gestion des statuts
-- **Gestion des utilisateurs** et rôles
+- **Gestion des utilisateurs** et des commandes
+- **Analytiques** et rapports de vente
 
-### 🔒 Sécurité
-- **Validation stricte** des données avec Zod
-- **Sanitization** des entrées utilisateur
-- **Rate limiting** et protection contre les attaques
-- **Headers de sécurité** complets
-- **Chiffrement** des données sensibles
+### 🎨 **Interface Moderne**
+- **Design sombre** et élégant
+- **Responsive** sur tous les appareils
+- **Animations fluides** et transitions
+- **Thème clair/sombre** avec persistance
+- **UX optimisée** avec feedback visuel
 
-### 📱 RGPD & Conformité
-- **Bannière de cookies** granulaire
-- **Politique de confidentialité** complète
-- **Gestion des consentements** par finalité
-- **Droits des utilisateurs** (accès, rectification, effacement)
-- **Sécurisation** des données personnelles
+### 🔒 **Sécurité & Conformité**
+- **Conformité RGPD** avec bannière de cookies
+- **Pages légales** complètes (Confidentialité, CGV, etc.)
+- **Validation des données** côté client et serveur
+- **Protection CSRF** et sécurisation des sessions
+- **Chiffrement des mots de passe** avec bcrypt
 
-## 🚀 Technologies
+## 🛠️ **Stack Technique**
 
-### Frontend
-- **Next.js 14** avec App Router
+### **Frontend**
+- **Next.js 14** (App Router)
 - **TypeScript** pour la sécurité des types
 - **Tailwind CSS** pour le styling
 - **Radix UI** pour les composants
-- **React Hook Form** pour les formulaires
+- **React Hook Form** + **Zod** pour les formulaires
 - **Zustand** pour la gestion d'état
 
-### Backend
-- **Next.js API Routes** pour l'API REST
+### **Backend**
+- **Next.js API Routes** (REST API)
 - **Prisma ORM** pour la base de données
 - **NextAuth.js** pour l'authentification
-- **Zod** pour la validation
-- **bcryptjs** pour le hachage des mots de passe
+- **PostgreSQL** (Railway) pour la base de données
 
-### Base de données
-- **PostgreSQL** hébergé sur Railway
-- **Schéma complet** avec relations optimisées
-- **Migrations** automatiques avec Prisma
+### **Outils & Services**
+- **Railway** pour l'hébergement de la base de données
+- **Vercel** pour le déploiement
+- **GitHub** pour le versioning
 
-### Sécurité
-- **Helmet.js** pour les headers de sécurité
-- **Rate limiting** avec express-rate-limit
-- **Validation** côté serveur et client
-- **Sanitization** des entrées
-- **CSRF protection**
+## 🚀 **Installation & Démarrage**
 
-## 📦 Installation
-
-### Prérequis
+### **Prérequis**
 - Node.js 18+ 
 - npm ou yarn
 - Compte Railway (pour la base de données)
 
-### 1. Cloner le projet
+### **1. Cloner le repository**
 ```bash
-git clone <repository-url>
-cd sneakers-ecommerce
+git clone https://github.com/Franck-F/bootcamp-web.git
+cd bootcamp-web
 ```
 
-### 2. Installer les dépendances
+### **2. Installer les dépendances**
 ```bash
 npm install
 ```
 
-### 3. Configuration de l'environnement
+### **3. Configuration de la base de données**
+1. Créer un projet sur [Railway](https://railway.app)
+2. Ajouter une base de données PostgreSQL
+3. Copier les variables de connexion
+
+### **4. Variables d'environnement**
 Créer un fichier `.env.local` :
 ```env
-# Base de données Railway
-DATABASE_URL="postgresql://postgres:password@host:port/database"
+# Base de données
+DATABASE_URL="postgresql://username:password@host:port/database"
 
-# NextAuth.js
+# NextAuth
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="votre-secret-super-securise"
+NEXTAUTH_SECRET="your-secret-key"
 
-# Stripe (optionnel pour paiement fictif)
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
-STRIPE_SECRET_KEY="sk_test_..."
-
-# Configuration de sécurité
-BCRYPT_ROUNDS=12
-JWT_SECRET="votre-jwt-secret"
-SESSION_TIMEOUT=3600000
+# Railway (optionnel)
+RAILWAY_STATIC_URL="your-railway-url"
 ```
 
-### 4. Configuration de la base de données
+### **5. Initialiser la base de données**
 ```bash
 # Générer le client Prisma
-npm run db:generate
+npx prisma generate
 
 # Appliquer les migrations
-npm run db:push
+npx prisma db push
 
-# Peupler la base de données
-npm run db:seed
+# Peupler la base de données (optionnel)
+npx prisma db seed
 ```
 
-### 5. Lancer le serveur de développement
+### **6. Démarrer le serveur de développement**
 ```bash
 npm run dev
 ```
 
 Le site sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-## 👤 Comptes de test
+## 📁 **Structure du Projet**
 
-Après le seeding, vous pouvez utiliser ces comptes :
-
-### 👑 Administrateur
-- **Email** : admin@sneakersstore.fr
-- **Mot de passe** : password123
-- **Accès** : Toutes les fonctionnalités
-
-### 👨‍💼 Vendeur
-- **Email** : vendeur@sneakersstore.fr
-- **Mot de passe** : password123
-- **Accès** : Gestion des produits et commandes
-
-### 👤 Client
-- **Email** : client@sneakersstore.fr
-- **Mot de passe** : password123
-- **Accès** : Achat et gestion du compte
-
-## 🏗️ Architecture
-
-### Structure des dossiers
 ```
 src/
 ├── app/                    # Pages Next.js (App Router)
-│   ├── admin/             # Interface d'administration
+│   ├── admin/             # Pages d'administration
+│   ├── api/               # API Routes
 │   ├── auth/              # Pages d'authentification
 │   ├── products/          # Pages produits
-│   └── api/               # Routes API
+│   └── ...
 ├── components/            # Composants React
-│   ├── ui/               # Composants UI de base
-│   ├── admin/            # Composants d'administration
-│   └── checkout/         # Composants de commande
-├── lib/                  # Utilitaires et configuration
-├── store/                # Gestion d'état (Zustand)
-└── types/                # Types TypeScript
+│   ├── admin/             # Composants d'administration
+│   ├── ui/                # Composants UI de base
+│   └── ...
+├── lib/                   # Utilitaires et configuration
+├── store/                 # Gestion d'état (Zustand)
+└── types/                 # Types TypeScript
 ```
 
-### Base de données
-Le schéma Prisma inclut :
+## 🎯 **Fonctionnalités Clés**
+
+### **Recherche Avancée**
+- Autocomplétion en temps réel
+- Recherche dans produits, marques, catégories
+- Suggestions visuelles avec images et prix
+- Navigation clavier et mobile-friendly
+
+### **Gestion des Stocks**
+- Suivi en temps réel des quantités
+- Alertes de stock faible
+- Gestion des variantes (taille, couleur)
+- Import/Export de données
+
+### **Processus d'Achat**
+- Panier persistant
+- Calcul automatique des taxes
+- Paiement fictif sécurisé
+- Confirmation par email (simulation)
+
+## 🌐 **Déploiement sur Vercel**
+
+### **1. Connecter le repository**
+1. Aller sur [Vercel](https://vercel.com)
+2. Importer le projet depuis GitHub
+3. Sélectionner le repository `bootcamp-web`
+
+### **2. Configuration des variables d'environnement**
+Dans Vercel, ajouter les variables :
+- `DATABASE_URL`
+- `NEXTAUTH_URL`
+- `NEXTAUTH_SECRET`
+
+### **3. Déploiement automatique**
+Vercel déploiera automatiquement à chaque push sur la branche `main`.
+
+## 📊 **Base de Données**
+
+Le projet utilise Prisma avec PostgreSQL. Le schéma inclut :
+
 - **Users** : Utilisateurs avec rôles
-- **Products** : Catalogue de produits
-- **StockItems** : Gestion des stocks par taille
-- **Orders** : Commandes et statuts
-- **OrderItems** : Détails des commandes
-- **Addresses** : Adresses de livraison
-- **Reviews** : Avis clients
-- **CookieConsent** : Gestion RGPD
+- **Products** : Produits avec variantes
+- **Orders** : Commandes et détails
+- **Categories** : Catégories de produits
+- **Brands** : Marques
+- **Variants** : Variantes de produits (taille, couleur)
 
-## 🔧 Scripts disponibles
+## 🔧 **Scripts Disponibles**
 
 ```bash
-# Développement
-npm run dev              # Serveur de développement
-npm run build           # Build de production
-npm run start           # Serveur de production
-npm run lint            # Linting ESLint
-
-# Base de données
-npm run db:generate     # Générer le client Prisma
-npm run db:push         # Appliquer les migrations
-npm run db:migrate      # Créer une nouvelle migration
-npm run db:studio       # Interface Prisma Studio
-npm run db:seed         # Peupler la base de données
+npm run dev          # Serveur de développement
+npm run build        # Build de production
+npm run start        # Serveur de production
+npm run lint         # Linting ESLint
+npm run type-check   # Vérification TypeScript
 ```
 
-## 🚀 Déploiement
-
-### Railway (Recommandé)
-1. Connecter votre repository GitHub à Railway
-2. Configurer les variables d'environnement
-3. Déployer automatiquement
-
-### Vercel
-1. Connecter votre repository à Vercel
-2. Configurer les variables d'environnement
-3. Déployer
-
-### Docker
-```bash
-# Build de l'image
-docker build -t sneakers-store .
-
-# Lancement du conteneur
-docker run -p 3000:3000 sneakers-store
-```
-
-## 📊 Fonctionnalités avancées
-
-### Gestion des stocks
-- **Réservation automatique** lors de l'ajout au panier
-- **Alertes de rupture** de stock
-- **Gestion par taille** et catégorie
-- **Mise à jour en temps réel**
-
-### Processus de commande
-- **Étapes multiples** : Livraison → Paiement → Confirmation
-- **Validation stricte** des données
-- **Paiement fictif** sécurisé
-- **Email de confirmation** (simulé)
-
-### Interface d'administration
-- **Tableau de bord** avec métriques
-- **Gestion des produits** avec upload d'images
-- **Suivi des commandes** en temps réel
-- **Gestion des utilisateurs** et rôles
-
-### Conformité RGPD
-- **Bannière de cookies** granulaire
-- **Gestion des consentements** par finalité
-- **Droits des utilisateurs** complets
-- **Politique de confidentialité** détaillée
-
-## 🛡️ Sécurité
-
-### Mesures implémentées
-- **Validation** stricte des entrées
-- **Sanitization** des données
-- **Rate limiting** par IP
-- **Headers de sécurité** complets
-- **Protection CSRF**
-- **Chiffrement** des données sensibles
-- **Authentification** robuste
-
-### Bonnes pratiques
-- **Principe du moindre privilège**
-- **Validation côté serveur** obligatoire
-- **Logging** des événements de sécurité
-- **Détection** d'activité suspecte
-
-## 📈 Performance
-
-### Optimisations
-- **Images optimisées** avec Next.js Image
-- **Lazy loading** des composants
-- **Cache** des requêtes API
-- **Compression** des assets
-- **CDN** pour les images
-
-### Monitoring
-- **Métriques** de performance
-- **Logs** structurés
-- **Alertes** automatiques
-- **Monitoring** 24/7
-
-## 🤝 Contribution
+## 📝 **Contribution**
 
 1. Fork le projet
 2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
@@ -277,17 +200,22 @@ docker run -p 3000:3000 sneakers-store
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
-## 📄 Licence
+## 📄 **Licence**
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 📞 Support
+## 👨‍💻 **Auteur**
 
-Pour toute question ou problème :
-- **Email** : contact@sneakersstore.fr
-- **Issues** : Utiliser le système d'issues GitHub
-- **Documentation** : Consulter la documentation du code
+**Franck-F** - [GitHub](https://github.com/Franck-F)
+
+## 🙏 **Remerciements**
+
+- [Next.js](https://nextjs.org/) pour le framework
+- [Tailwind CSS](https://tailwindcss.com/) pour le styling
+- [Prisma](https://prisma.io/) pour l'ORM
+- [Railway](https://railway.app/) pour l'hébergement de la base de données
+- [Vercel](https://vercel.com/) pour le déploiement
 
 ---
 
-**Développé avec ❤️ pour un e-commerce moderne et sécurisé**
+⭐ **N'hésitez pas à donner une étoile si ce projet vous a aidé !**
