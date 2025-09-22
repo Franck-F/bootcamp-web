@@ -16,17 +16,20 @@ export async function GET(request: NextRequest) {
     }
     
     // Récupérer le panier depuis la base de données
-    const cartItems = await prisma.cart_items.findMany({
+    const cartItems = await prisma.shopping_carts.findMany({
       where: {
         user_id: parseInt(session.user.id)
       },
       include: {
-        products: {
+        variants: {
           include: {
-            brands: true,
-            categories: true,
-            product_images: true,
-            variants: true
+            products: {
+              include: {
+                brands: true,
+                categories: true,
+                product_images: true
+              }
+            }
           }
         }
       }
@@ -34,18 +37,18 @@ export async function GET(request: NextRequest) {
     
     // Transformer les données pour correspondre au format attendu
     const formattedCartItems = cartItems.map(item => ({
-      productId: item.product_id.toString(),
-      size: item.size,
+      productId: item.variants.products.id.toString(),
+      size: item.variants.size,
       quantity: item.quantity,
       addedAt: item.created_at.toISOString(),
       product: {
-        id: item.products.id.toString(),
-        name: item.products.name,
-        brand: item.products.brands?.name || 'Marque inconnue',
-        price: item.products.price,
-        images: item.products.product_images?.map(img => img.image_url) || [],
-        availableStock: item.products.variants?.reduce((total, variant) => total + variant.stock, 0) || 0,
-        category: item.products.categories?.name
+        id: item.variants.products.id.toString(),
+        name: item.variants.products.name,
+        brand: item.variants.products.brands?.name || 'Marque inconnue',
+        price: item.variants.price,
+        images: item.variants.products.product_images?.map(img => img.image_url) || [],
+        availableStock: item.variants.stock,
+        category: item.variants.products.categories?.name
       }
     }))
     
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Si c'est un tableau, c'est le panier complet à sauvegarder
     if (Array.isArray(body)) {
       // Supprimer l'ancien panier
-      await prisma.cart_items.deleteMany({
+      await prisma.shopping_carts.deleteMany({
         where: {
           user_id: parseInt(session.user.id)
         }
@@ -85,15 +88,24 @@ export async function POST(request: NextRequest) {
       
       // Ajouter les nouveaux articles
       for (const item of body) {
-        await prisma.cart_items.create({
-          data: {
-            user_id: parseInt(session.user.id),
+        // Trouver la variante correspondante
+        const variant = await prisma.variants.findFirst({
+          where: {
             product_id: parseInt(item.productId),
-            size: item.size,
-            quantity: item.quantity,
-            created_at: new Date(item.addedAt)
+            size: item.size
           }
         })
+        
+        if (variant) {
+          await prisma.shopping_carts.create({
+            data: {
+              user_id: parseInt(session.user.id),
+              product_variant_id: variant.id,
+              quantity: item.quantity,
+              updated_at: new Date()
+            }
+          })
+        }
       }
       
       return NextResponse.json({
@@ -112,18 +124,32 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Vérifier si l'article existe déjà dans le panier
-    const existingItem = await prisma.cart_items.findFirst({
+    // Trouver la variante correspondante
+    const variant = await prisma.variants.findFirst({
       where: {
-        user_id: parseInt(session.user.id),
         product_id: parseInt(productId),
         size: size
       }
     })
     
+    if (!variant) {
+      return NextResponse.json(
+        { error: 'Variante non trouvée' },
+        { status: 404 }
+      )
+    }
+    
+    // Vérifier si l'article existe déjà dans le panier
+    const existingItem = await prisma.shopping_carts.findFirst({
+      where: {
+        user_id: parseInt(session.user.id),
+        product_variant_id: variant.id
+      }
+    })
+    
     if (existingItem) {
       // Mettre à jour la quantité
-      await prisma.cart_items.update({
+      await prisma.shopping_carts.update({
         where: {
           id: existingItem.id
         },
@@ -133,12 +159,12 @@ export async function POST(request: NextRequest) {
       })
     } else {
       // Créer un nouvel article
-      await prisma.cart_items.create({
+      await prisma.shopping_carts.create({
         data: {
           user_id: parseInt(session.user.id),
-          product_id: parseInt(productId),
-          size: size,
-          quantity: quantity
+          product_variant_id: variant.id,
+          quantity: quantity,
+          updated_at: new Date()
         }
       })
     }
@@ -179,12 +205,26 @@ export async function PUT(request: NextRequest) {
       )
     }
     
-    // Trouver l'article dans le panier
-    const cartItem = await prisma.cart_items.findFirst({
+    // Trouver la variante correspondante
+    const variant = await prisma.variants.findFirst({
       where: {
-        user_id: parseInt(session.user.id),
         product_id: parseInt(productId),
         size: size
+      }
+    })
+    
+    if (!variant) {
+      return NextResponse.json(
+        { error: 'Variante non trouvée' },
+        { status: 404 }
+      )
+    }
+    
+    // Trouver l'article dans le panier
+    const cartItem = await prisma.shopping_carts.findFirst({
+      where: {
+        user_id: parseInt(session.user.id),
+        product_variant_id: variant.id
       }
     })
     
@@ -197,14 +237,14 @@ export async function PUT(request: NextRequest) {
     
     if (quantity <= 0) {
       // Supprimer l'article si la quantité est 0 ou négative
-      await prisma.cart_items.delete({
+      await prisma.shopping_carts.delete({
         where: {
           id: cartItem.id
         }
       })
     } else {
       // Mettre à jour la quantité
-      await prisma.cart_items.update({
+      await prisma.shopping_carts.update({
         where: {
           id: cartItem.id
         },
@@ -251,21 +291,30 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    // Trouver et supprimer l'article du panier
-    const cartItem = await prisma.cart_items.findFirst({
+    // Trouver la variante correspondante
+    const variant = await prisma.variants.findFirst({
       where: {
-        user_id: parseInt(session.user.id),
         product_id: parseInt(productId),
         size: size
       }
     })
     
-    if (cartItem) {
-      await prisma.cart_items.delete({
+    if (variant) {
+      // Trouver et supprimer l'article du panier
+      const cartItem = await prisma.shopping_carts.findFirst({
         where: {
-          id: cartItem.id
+          user_id: parseInt(session.user.id),
+          product_variant_id: variant.id
         }
       })
+      
+      if (cartItem) {
+        await prisma.shopping_carts.delete({
+          where: {
+            id: cartItem.id
+          }
+        })
+      }
     }
     
     return NextResponse.json({

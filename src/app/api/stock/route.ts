@@ -58,10 +58,10 @@ export async function GET(request: NextRequest) {
         minStock: 5,
         maxStock: 100,
         price: product.price,
-        lastUpdated: product.updated_at?.toISOString() || product.created_at.toISOString(),
+        lastUpdated: product.created_at.toISOString(),
         status,
         sales: Math.floor(Math.random() * 50), // Simulé
-        revenue: product.price * Math.floor(Math.random() * 20), // Simulé
+        revenue: Number(product.price) * Math.floor(Math.random() * 20), // Simulé
         image: product.product_images[0]?.image_url || '/images/placeholder-sneaker.jpg',
         variants: product.variants.map(variant => ({
           id: variant.id,

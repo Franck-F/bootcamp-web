@@ -63,12 +63,12 @@ export async function GET(
       orderNumber: order.order_number,
       status: order.status,
       paymentStatus: order.payment_status,
-      total: parseFloat(order.total.toString()),
-      subtotal: parseFloat(order.subtotal.toString()),
-      tax: parseFloat(order.tax.toString()),
-      shipping: parseFloat(order.shipping.toString()),
+      total: parseFloat(order.total_amount.toString()),
+      subtotal: parseFloat(order.total_amount.toString()), // Utiliser total_amount comme subtotal
+      tax: 0, // Pas de champ tax dans le schéma
+      shipping: 0, // Pas de champ shipping dans le schéma
       createdAt: order.created_at.toISOString(),
-      shippingAddress: order.shipping_address ? JSON.parse(order.shipping_address) : null,
+      shippingAddress: order.shipping_address,
       items: order.order_items.map(item => ({
         id: item.id,
         productName: item.variants.products.name,

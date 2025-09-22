@@ -85,7 +85,7 @@ export function FeaturedProductsNew() {
           quantity: 1,
           addedAt: new Date().toISOString(),
           product: {
-            id: product.id,
+            id: product.id.toString(),
             name: product.name,
             price: product.price,
             images: product.images,

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { Package } from 'lucide-react'
 import { Navigation } from '@/components/navigation'
 import { CheckoutForm } from '@/components/checkout/checkout-form'
 import { OrderSummary } from '@/components/checkout/order-summary'
@@ -51,12 +52,12 @@ export default function CheckoutPage() {
   }, [session, router, state.items.length])
 
   const handleStepNext = (stepData: any) => {
-    setFormData(prev => ({ ...prev, ...stepData }))
-    setCurrentStep(prev => prev + 1)
+    setFormData((prev: any) => ({ ...prev, ...stepData }))
+    setCurrentStep((prev: number) => prev + 1)
   }
 
   const handleStepBack = () => {
-    setCurrentStep(prev => prev - 1)
+    setCurrentStep((prev: number) => prev - 1)
   }
 
   const handlePlaceOrder = async () => {

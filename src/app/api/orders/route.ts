@@ -47,10 +47,10 @@ export async function GET(request: NextRequest) {
       orderNumber: order.order_number,
       status: order.status,
       paymentStatus: order.payment_status,
-      total: parseFloat(order.total.toString()),
-      subtotal: parseFloat(order.subtotal.toString()),
-      tax: parseFloat(order.tax.toString()),
-      shipping: parseFloat(order.shipping.toString()),
+      total: parseFloat(order.total_amount.toString()),
+      subtotal: parseFloat(order.total_amount.toString()), // Utiliser total_amount comme subtotal
+      tax: 0, // Pas de champ tax dans le schéma
+      shipping: 0, // Pas de champ shipping dans le schéma
       createdAt: order.created_at.toISOString(),
       shippingAddress: order.shipping_address,
       items: order.order_items.map(item => ({
@@ -120,15 +120,12 @@ export async function POST(request: NextRequest) {
       data: {
         user_id: parseInt(session.user.id),
         order_number: orderNumber,
-        status: 'processing',
-        payment_status: 'paid',
-        subtotal: subtotal,
-        tax: tax,
-        shipping: shipping,
-        total: total,
+        status: 'pending',
+        payment_status: 'pending',
+        total_amount: total,
         shipping_address: JSON.stringify(address),
         payment_method: paymentMethod.method,
-        transaction_id: transactionId,
+        payment_intent_id: transactionId,
         created_at: new Date(),
         updated_at: new Date()
       }
@@ -148,7 +145,7 @@ export async function POST(request: NextRequest) {
         await prisma.order_items.create({
           data: {
             order_id: order.id,
-            variant_id: variant.id,
+            product_variant_id: variant.id,
             quantity: item.quantity,
             unit_price: item.product?.price || 0,
             created_at: new Date()
@@ -170,7 +167,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Vider le panier de l'utilisateur
-    await prisma.cart_items.deleteMany({
+    await prisma.shopping_carts.deleteMany({
       where: {
         user_id: parseInt(session.user.id)
       }
@@ -207,7 +204,7 @@ export async function POST(request: NextRequest) {
         orderNumber: createdOrder!.order_number,
         status: createdOrder!.status,
         paymentStatus: createdOrder!.payment_status,
-        total: parseFloat(createdOrder!.total.toString()),
+        total: parseFloat(createdOrder!.total_amount.toString()),
         createdAt: createdOrder!.created_at.toISOString(),
         items: createdOrder!.order_items.map(item => ({
           id: item.id,

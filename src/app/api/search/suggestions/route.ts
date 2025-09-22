@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     ])
 
     // Formater les suggestions
-    const suggestions = []
+    const suggestions: any[] = []
 
     // Ajouter les produits
     products.forEach(product => {
