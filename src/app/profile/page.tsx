@@ -71,7 +71,7 @@ export default function ProfilePage() {
         postalCode: '75001',
         country: 'France',
         role: session.user.role || 'customer',
-        createdAt: '2024-01-15',
+        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         lastLogin: new Date().toISOString()
       })
 

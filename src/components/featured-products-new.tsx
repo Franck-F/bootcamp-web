@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { useCart } from '@/store/cart-context'
 import { 
   Star, 
   ShoppingCart, 
@@ -20,67 +21,51 @@ import {
   Award
 } from 'lucide-react'
 
-interface FeaturedProduct {
+interface Product {
   id: number
   name: string
   brand: string
   price: number
-  originalPrice?: number
-  discount?: number
-  rating: number
-  reviews: number
-  stock: number
-  image: string
+  images: string[]
+  variants: Array<{
+    id: number
+    size: string
+    stock: number
+  }>
+  category: string
   isNew?: boolean
-  colors: string[]
+  discount?: number
+  rating?: number
+  reviews?: number
 }
 
 export function FeaturedProductsNew() {
   const router = useRouter()
-  const [products] = useState<FeaturedProduct[]>([
-    {
-      id: 1,
-      name: 'Nike Air Force 1 \'Camo\'',
-      brand: 'Nike',
-      price: 405,
-      originalPrice: 450,
-      discount: 10,
-      rating: 4.8,
-      reviews: 1247,
-      stock: 24,
-      image: 'https://cdn.shopify.com/s/files/1/0603/3031/1875/products/main-square_107628ca-8acc-4f95-9a58-1922e8c31518.jpg?v=1695974200',
-      colors: ['#000000', '#808080']
-    },
-    {
-      id: 2,
-      name: 'Nike KD 7 \'Away\'',
-      brand: 'Nike',
-      price: 267,
-      rating: 4.8,
-      reviews: 892,
-      stock: 17,
-      image: 'https://cdn.shopify.com/s/files/1/0603/3031/1875/files/main-square_b99b60e1-ebf9-48f9-98d9-e484f6ce4501.jpg?v=1708490285',
-      isNew: true,
-      colors: ['#000000', '#FFFFFF']
-    },
-    {
-      id: 3,
-      name: 'Nike Air Max Zero Essential \'Black Grey\'',
-      brand: 'Nike',
-      price: 215,
-      originalPrice: 250,
-      discount: 14,
-      rating: 4.8,
-      reviews: 634,
-      stock: 27,
-      image: 'https://cdn.shopify.com/s/files/1/0603/3031/1875/products/main-square_44fd6ba6-e129-40e0-af82-75e6b891fbc3.jpg?v=1656836081',
-      isNew: true,
-      colors: ['#000000', '#808080']
-    }
-  ])
-
+  const { addItem } = useCart()
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
   const [favorites, setFavorites] = useState<number[]>([])
   const [addingToCart, setAddingToCart] = useState<number | null>(null)
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const response = await fetch('/api/products?featured=true&limit=3')
+        if (response.ok) {
+          const data = await response.json()
+          setProducts(data.products || [])
+        } else {
+          console.error('Erreur lors du chargement des produits')
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des produits:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFeaturedProducts()
+  }, [])
 
   const toggleFavorite = (productId: number) => {
     setFavorites(prev => 
@@ -90,29 +75,28 @@ export function FeaturedProductsNew() {
     )
   }
 
-  const addToCart = async (product: FeaturedProduct) => {
+  const addToCart = async (product: Product) => {
     setAddingToCart(product.id)
     try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          quantity: 1,
-          variantId: null // Utiliser la première variante disponible
-        }),
-      })
-
-      if (response.ok) {
-        // Optionnel: Afficher une notification de succès
-        console.log('Produit ajouté au panier')
-      } else {
-        console.error('Erreur lors de l\'ajout au panier')
+      // Trouver une variante disponible
+      const availableVariant = product.variants.find(variant => variant.stock > 0)
+      if (!availableVariant) {
+        alert('Ce produit n\'est plus en stock')
+        return
       }
+
+      await addItem({
+        productId: product.id.toString(),
+        size: availableVariant.size,
+        quantity: 1,
+        addedAt: new Date().toISOString(),
+      })
+      
+      // Feedback visuel de succès
+      console.log('Produit ajouté au panier')
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error('Erreur lors de l\'ajout au panier:', error)
+      alert('Erreur lors de l\'ajout au panier. Veuillez réessayer.')
     } finally {
       setAddingToCart(null)
     }
@@ -154,19 +138,44 @@ export function FeaturedProductsNew() {
 
         {/* Enhanced Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {products.map((product, index) => {
-            const isFavorite = favorites.includes(product.id)
-            const isInStock = product.stock > 0
+          {loading ? (
+            // Loading state
+            Array.from({ length: 3 }).map((_, index) => (
+              <Card key={index} className="group bg-gray-800/30 border border-gray-700/50 text-white rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm">
+                <div className="relative h-80 w-full overflow-hidden bg-gray-700 animate-pulse">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 border-4 border-gray-600 border-t-red-500 rounded-full animate-spin"></div>
+                  </div>
+                </div>
+                <CardContent className="p-8">
+                  <div className="space-y-4">
+                    <div className="h-4 bg-gray-700 rounded animate-pulse"></div>
+                    <div className="h-6 bg-gray-700 rounded animate-pulse"></div>
+                    <div className="h-8 bg-gray-700 rounded animate-pulse"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : products.length === 0 ? (
+            // Empty state
+            <div className="col-span-full text-center py-20">
+              <p className="text-gray-400 text-xl">Aucun produit disponible pour le moment.</p>
+            </div>
+          ) : (
+            products.map((product, index) => {
+              const isFavorite = favorites.includes(product.id)
+              const totalStock = product.variants.reduce((sum, variant) => sum + variant.stock, 0)
+              const isInStock = totalStock > 0
 
-            return (
-              <Card key={product.id} className="group bg-gray-800/30 border border-gray-700/50 text-white rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-500/20 transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 backdrop-blur-sm">
-                <div className="relative h-80 w-full overflow-hidden bg-white">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-8 transition-transform duration-700 group-hover:scale-110"
-                  />
+              return (
+                <Card key={product.id} className="group bg-gray-800/30 border border-gray-700/50 text-white rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-500/20 transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 backdrop-blur-sm">
+                  <div className="relative h-80 w-full overflow-hidden bg-white">
+                    <Image
+                      src={product.images && product.images.length > 0 ? product.images[0] : '/fashion-shoes-sneakers.png'}
+                      alt={product.name}
+                      fill
+                      className="object-contain p-8 transition-transform duration-700 group-hover:scale-110"
+                    />
                   
                   {/* Enhanced Badges */}
                   <div className="absolute top-4 left-4 flex flex-col space-y-2">
@@ -197,8 +206,8 @@ export function FeaturedProductsNew() {
 
                   {/* Stock Indicator */}
                   <div className="absolute bottom-4 left-4">
-                    <Badge className="bg-green-600/90 text-white text-xs px-2 py-1">
-                      {product.stock} en stock
+                    <Badge className={`${isInStock ? 'bg-green-600/90' : 'bg-red-600/90'} text-white text-xs px-2 py-1`}>
+                      {isInStock ? `${totalStock} en stock` : 'Rupture de stock'}
                     </Badge>
                   </div>
                 </div>
@@ -210,12 +219,14 @@ export function FeaturedProductsNew() {
                       <Badge className="bg-gray-700/50 text-gray-300 border-gray-600">
                         {product.brand}
                       </Badge>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-400 font-medium">
-                          {product.rating} ({product.reviews})
-                        </span>
-                      </div>
+                      {product.rating && (
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="text-sm text-gray-400 font-medium">
+                            {product.rating} ({product.reviews || 0})
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Product Name */}
@@ -226,26 +237,13 @@ export function FeaturedProductsNew() {
                     {/* Price */}
                     <div className="flex items-center space-x-3">
                       <span className="product-price text-3xl text-white">
-                        {product.price.toFixed(2)}€
+                        {Number(product.price).toFixed(2)}€
                       </span>
-                      {product.originalPrice && (
+                      {product.discount && (
                         <span className="text-lg text-gray-400 line-through">
-                          {product.originalPrice.toFixed(2)}€
+                          {((Number(product.price) * 100) / (100 - product.discount)).toFixed(2)}€
                         </span>
                       )}
-                    </div>
-
-                    {/* Color Options */}
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-400">Couleurs:</span>
-                      {product.colors.map((color, colorIndex) => (
-                        <div
-                          key={colorIndex}
-                          className="w-6 h-6 rounded-full border-2 border-gray-600 hover:border-white transition-colors cursor-pointer"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        ></div>
-                      ))}
                     </div>
 
                     {/* Action Buttons */}
@@ -261,21 +259,22 @@ export function FeaturedProductsNew() {
                       <Button 
                         className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300"
                         onClick={() => addToCart(product)}
-                        disabled={addingToCart === product.id}
+                        disabled={addingToCart === product.id || !isInStock}
                       >
                         {addingToCart === product.id ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                         ) : (
                           <ShoppingCart className="w-4 h-4 mr-2" />
                         )}
-                        {addingToCart === product.id ? 'Ajout...' : 'Ajouter'}
+                        {addingToCart === product.id ? 'Ajout...' : !isInStock ? 'Rupture' : 'Ajouter'}
                       </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             )
-          })}
+          })
+          )}
         </div>
 
         {/* Enhanced CTA */}

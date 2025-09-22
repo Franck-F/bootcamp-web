@@ -12,7 +12,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { 
   ArrowLeft, 
   ShoppingCart, 
-  Heart, 
   Star, 
   Truck, 
   Shield, 
@@ -21,6 +20,7 @@ import {
   Minus,
   Check
 } from 'lucide-react'
+import { WishlistButton } from '@/components/wishlist-button'
 
 interface Product {
   id: number
@@ -73,7 +73,6 @@ export default function ProductDetailsPage() {
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
   const [addingToCart, setAddingToCart] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
 
   useEffect(() => {
@@ -137,9 +136,6 @@ export default function ProductDetailsPage() {
     }
   }
 
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite)
-  }
 
   const selectVariant = (variant: any) => {
     setSelectedVariant(variant)
@@ -278,6 +274,7 @@ export default function ProductDetailsPage() {
                         ? 'border-red-500 ring-2 ring-red-500/20' 
                         : 'border-gray-200 hover:border-gray-400'
                     }`}
+                    title={`Voir l'image ${index + 1}`}
                   >
                     <Image
                       src={image.image_url}
@@ -466,18 +463,12 @@ export default function ProductDetailsPage() {
                   )}
                   {addingToCart ? 'Ajout...' : 'Ajouter au panier'}
                 </Button>
-                <Button
-                  variant="outline"
+                <WishlistButton 
+                  productId={product.id}
                   size="icon"
-                  onClick={toggleFavorite}
-                  className={`border-2 ${
-                    isFavorite 
-                      ? 'border-red-500 bg-red-500/10 text-red-400' 
-                      : 'border-gray-600 text-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-                </Button>
+                  variant="outline"
+                  className="border-2 border-gray-600 text-gray-300 hover:border-gray-400 dark:border-gray-400 dark:text-gray-300 dark:hover:border-gray-300"
+                />
               </div>
 
               {/* Features */}

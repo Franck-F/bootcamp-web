@@ -18,8 +18,10 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react'
+import { generateOrderNumber, generateMockCreationDate, generateMockUpdateDate } from '@/lib/date-utils'
 
 interface OrderItem {
   id: number
@@ -68,12 +70,12 @@ export default function OrdersPage() {
       setOrders([
         {
           id: 1,
-          orderNumber: 'CMD-2024-001',
+          orderNumber: generateOrderNumber(),
           status: 'delivered',
           paymentStatus: 'paid',
           total: 405.00,
-          createdAt: '2024-01-15T10:30:00Z',
-          updatedAt: '2024-01-18T14:20:00Z',
+          createdAt: generateMockCreationDate(15),
+          updatedAt: generateMockUpdateDate(12),
           trackingNumber: 'TRK123456789',
           shippingAddress: {
             name: 'Jean Dupont',
@@ -97,12 +99,12 @@ export default function OrdersPage() {
         },
         {
           id: 2,
-          orderNumber: 'CMD-2024-002',
+          orderNumber: generateOrderNumber(),
           status: 'shipped',
           paymentStatus: 'paid',
           total: 299.00,
-          createdAt: '2024-01-20T15:45:00Z',
-          updatedAt: '2024-01-22T09:15:00Z',
+          createdAt: generateMockCreationDate(10),
+          updatedAt: generateMockUpdateDate(8),
           trackingNumber: 'TRK987654321',
           shippingAddress: {
             name: 'Jean Dupont',
@@ -126,12 +128,12 @@ export default function OrdersPage() {
         },
         {
           id: 3,
-          orderNumber: 'CMD-2024-003',
+          orderNumber: generateOrderNumber(),
           status: 'processing',
           paymentStatus: 'paid',
           total: 189.00,
-          createdAt: '2024-01-25T11:20:00Z',
-          updatedAt: '2024-01-25T11:20:00Z',
+          createdAt: generateMockCreationDate(5),
+          updatedAt: generateMockUpdateDate(5),
           shippingAddress: {
             name: 'Jean Dupont',
             address: '123 Rue de la Mode',

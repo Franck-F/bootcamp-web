@@ -1,47 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, Monitor } from 'lucide-react'
+import { useTheme } from './theme-provider'
 import { ClientOnly } from './client-only'
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    
-    // Vérifier que nous sommes côté client
-    if (typeof window === 'undefined') return
-    
-    // Récupérer le thème depuis localStorage ou utiliser le thème système
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    const initialTheme = savedTheme || systemTheme
-    
-    setTheme(initialTheme)
-    applyTheme(initialTheme)
-  }, [])
-
-  const applyTheme = (newTheme: 'light' | 'dark') => {
-    if (typeof window === 'undefined') return
-    
-    const root = document.documentElement
-    
-    if (newTheme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-    
-    localStorage.setItem('theme', newTheme)
-  }
+  const { theme, setTheme } = useTheme()
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    applyTheme(newTheme)
+    if (theme === 'light') {
+      setTheme('dark')
+    } else if (theme === 'dark') {
+      setTheme('system')
+    } else {
+      setTheme('light')
+    }
+  }
+
+  const getIcon = () => {
+    if (theme === 'light') return <Sun className="h-5 w-5" />
+    if (theme === 'dark') return <Moon className="h-5 w-5" />
+    return <Monitor className="h-5 w-5" />
+  }
+
+  const getLabel = () => {
+    if (theme === 'light') return 'Basculer vers le thème sombre'
+    if (theme === 'dark') return 'Basculer vers le thème système'
+    return 'Basculer vers le thème clair'
   }
 
   return (
@@ -62,10 +48,9 @@ export function ThemeToggle() {
         size="icon"
         onClick={toggleTheme}
         className="relative"
-        aria-label={`Basculer vers le thème ${theme === 'light' ? 'sombre' : 'clair'}`}
+        aria-label={getLabel()}
       >
-        <Sun className={`h-5 w-5 transition-all ${theme === 'light' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'}`} />
-        <Moon className={`absolute h-5 w-5 transition-all ${theme === 'dark' ? 'rotate-0 scale-100' : '-rotate-90 scale-0'}`} />
+        {getIcon()}
       </Button>
     </ClientOnly>
   )

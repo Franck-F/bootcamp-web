@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useCart } from '@/store/cart-context'
+import { useWishlist } from '@/store/wishlist-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CartSidebar } from '@/components/cart-sidebar'
@@ -24,6 +25,7 @@ import { SearchBar } from '@/components/search-bar'
 export function Navigation() {
   const { data: session } = useSession()
   const { getTotalItems, toggleCart } = useCart()
+  const { getWishlistCount } = useWishlist()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = () => {
@@ -77,9 +79,19 @@ export function Navigation() {
             />
 
             {/* Favoris */}
-            <Button variant="ghost" size="icon" className="text-gray-300 hover:text-white">
-              <Heart className="w-5 h-5" />
-            </Button>
+            <Link href="/wishlist">
+              <Button variant="ghost" size="icon" className="relative text-gray-300 hover:text-white">
+                <Heart className="w-5 h-5" />
+                {getWishlistCount() > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {getWishlistCount()}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
 
             {/* Basculement de thème */}
             <ThemeToggle />

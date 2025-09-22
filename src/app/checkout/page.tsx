@@ -11,8 +11,10 @@ import { Footer } from '@/components/footer'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, CreditCard, Truck, Shield } from 'lucide-react'
+import { CheckCircle, CreditCard, Truck, Shield, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useCart } from '@/store/cart-context'
+import '@/styles/checkout-dark.css'
 
 interface CartItem {
   productId: string
@@ -30,9 +32,9 @@ interface CartItem {
 export default function CheckoutPage() {
   const { data: session } = useSession()
   const router = useRouter()
+  const { state, getSubtotal, getTax, getShipping, getTotalPrice, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [formData, setFormData] = useState<any>({})
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
@@ -40,91 +42,112 @@ export default function CheckoutPage() {
       router.push('/auth/signin')
       return
     }
-    fetchCartItems()
-  }, [session, router])
-
-  const fetchCartItems = async () => {
-    try {
-      const response = await fetch('/api/cart')
-      if (response.ok) {
-        const data = await response.json()
-        setCartItems(data)
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement du panier:', error)
-    } finally {
-      setLoading(false)
+    
+    // Rediriger si le panier est vide
+    if (state.items.length === 0) {
+      router.push('/products')
+      return
     }
+  }, [session, router, state.items.length])
+
+  const handleStepNext = (stepData: any) => {
+    setFormData(prev => ({ ...prev, ...stepData }))
+    setCurrentStep(prev => prev + 1)
   }
 
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => {
-      return total + (item.product?.price || 0) * item.quantity
-    }, 0)
+  const handleStepBack = () => {
+    setCurrentStep(prev => prev - 1)
   }
 
-  const calculateShipping = (subtotal: number) => {
-    return subtotal >= 100 ? 0 : 9.99
-  }
-
-  const calculateTax = (subtotal: number, shipping: number) => {
-    return Math.round((subtotal + shipping) * 0.20 * 100) / 100
-  }
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal()
-    const shipping = calculateShipping(subtotal)
-    const tax = calculateTax(subtotal, shipping)
-    return subtotal + shipping + tax
-  }
-
-  const handlePlaceOrder = async (orderData: any) => {
+  const handlePlaceOrder = async () => {
     setProcessing(true)
     try {
-      const response = await fetch('/api/orders', {
+      // Étape 1: Traiter le paiement
+      const paymentResponse = await fetch('/api/payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          cartItems,
-          address: orderData.address,
-          paymentMethod: orderData.paymentMethod,
+          paymentMethod: formData.paymentMethod,
+          amount: getTotalPrice(),
         }),
       })
 
-      if (response.ok) {
-        const order = await response.json()
+      const paymentResult = await paymentResponse.json()
+
+      if (!paymentResult.success) {
+        toast.error(paymentResult.error || 'Échec du paiement')
+        return
+      }
+
+      toast.success('Paiement traité avec succès !')
+
+      // Étape 2: Créer la commande
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cartItems: state.items,
+          address: formData.address,
+          paymentMethod: formData.paymentMethod,
+          subtotal: getSubtotal(),
+          tax: getTax(),
+          shipping: getShipping(),
+          total: getTotalPrice(),
+          transactionId: paymentResult.transactionId,
+        }),
+      })
+
+      if (orderResponse.ok) {
+        const result = await orderResponse.json()
         toast.success('Commande passée avec succès !')
-        router.push(`/orders/${order.id}`)
+        
+        // Vider le panier
+        clearCart()
+        
+        // Rediriger vers la page de confirmation
+        router.push(`/orders/${result.order.id}`)
       } else {
-        const error = await response.json()
-        toast.error(error.error || 'Erreur lors de la commande')
+        const error = await orderResponse.json()
+        toast.error(error.error || 'Erreur lors de la création de la commande')
       }
     } catch (error) {
-      toast.error('Une erreur est survenue')
+      console.error('Erreur lors de la commande:', error)
+      toast.error('Une erreur est survenue lors du traitement de votre commande')
     } finally {
       setProcessing(false)
     }
   }
 
-  if (loading) {
+  if (state.isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600"></div>
+          <div className="absolute inset-0 animate-pulse rounded-full h-32 w-32 border border-red-600/30"></div>
+        </div>
       </div>
     )
   }
 
-  if (cartItems.length === 0) {
+  if (state.items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Votre panier est vide</h1>
-            <p className="text-gray-600 mb-8">Ajoutez des produits à votre panier avant de passer commande.</p>
-            <Button onClick={() => router.push('/products')}>
+            <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-red-600/20 to-pink-600/20 rounded-full flex items-center justify-center">
+              <Package className="w-12 h-12 text-red-400" />
+            </div>
+            <h1 className="text-3xl font-black text-white mb-4">Votre panier est vide</h1>
+            <p className="text-gray-400 mb-8 text-lg">Ajoutez des produits à votre panier avant de passer commande.</p>
+            <Button 
+              onClick={() => router.push('/products')}
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+            >
               Continuer mes achats
             </Button>
           </div>
@@ -141,12 +164,22 @@ export default function CheckoutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Progress Steps */}
-        <div className="mb-8">
+        {/* Header avec titre stylé */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-black text-white mb-4 bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent">
+            Finaliser votre commande
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Complétez votre achat en quelques étapes simples
+          </p>
+        </div>
+
+        {/* Progress Steps modernisés */}
+        <div className="mb-12">
           <div className="flex items-center justify-center space-x-8">
             {steps.map((step, index) => {
               const Icon = step.icon
@@ -155,29 +188,32 @@ export default function CheckoutPage() {
               
               return (
                 <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                  <div className={`relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 ${
                     isCompleted 
-                      ? 'bg-green-600 border-green-600 text-white' 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/25' 
                       : isActive 
-                        ? 'bg-blue-600 border-blue-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-500'
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 border-red-500 text-white shadow-lg shadow-red-500/25' 
+                        : 'bg-gray-800 border-gray-600 text-gray-400'
                   }`}>
                     {isCompleted ? (
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-6 h-6" />
                     ) : (
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-6 h-6" />
+                    )}
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-500 to-pink-500 animate-pulse opacity-30"></div>
                     )}
                   </div>
-                  <div className="ml-3">
-                    <p className={`text-sm font-medium ${
-                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                  <div className="ml-4">
+                    <p className={`text-sm font-bold ${
+                      isActive ? 'text-red-400' : isCompleted ? 'text-green-400' : 'text-gray-500'
                     }`}>
                       {step.name}
                     </p>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-16 h-0.5 mx-4 ${
-                      isCompleted ? 'bg-green-600' : 'bg-gray-300'
+                    <div className={`w-20 h-1 mx-6 rounded-full transition-all duration-300 ${
+                      isCompleted ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gray-700'
                     }`} />
                   )}
                 </div>
@@ -191,48 +227,56 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             {currentStep === 1 && (
               <CheckoutForm
-                onNext={(data) => {
-                  // Store form data and move to next step
-                  setCurrentStep(2)
-                }}
+                onNext={handleStepNext}
               />
             )}
             
             {currentStep === 2 && (
               <PaymentForm
-                onNext={(data) => {
-                  // Store payment data and move to next step
-                  setCurrentStep(3)
-                }}
-                onBack={() => setCurrentStep(1)}
+                onNext={handleStepNext}
+                onBack={handleStepBack}
               />
             )}
             
             {currentStep === 3 && (
               <div className="space-y-6">
-                <Card>
+                <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Shield className="w-5 h-5 text-green-600" />
+                    <CardTitle className="flex items-center space-x-2 text-white">
+                      <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg">
+                        <Shield className="w-5 h-5 text-white" />
+                      </div>
                       <span>Confirmation de commande</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-center py-8">
-                      <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      <div className="relative mb-6">
+                        <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-green-500/25">
+                          <CheckCircle className="w-10 h-10 text-white" />
+                        </div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse opacity-30"></div>
+                      </div>
+                      <h3 className="text-2xl font-black text-white mb-3">
                         Votre commande est prête !
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-gray-400 mb-8 text-lg">
                         Vérifiez les détails ci-dessous et confirmez votre commande.
                       </p>
                       <Button
                         size="lg"
                         onClick={handlePlaceOrder}
                         disabled={processing}
-                        className="w-full"
+                        className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {processing ? 'Traitement...' : 'Confirmer la commande'}
+                        {processing ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                            Traitement du paiement...
+                          </>
+                        ) : (
+                          'Confirmer la commande'
+                        )}
                       </Button>
                     </div>
                   </CardContent>
@@ -244,11 +288,11 @@ export default function CheckoutPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <OrderSummary
-              cartItems={cartItems}
-              subtotal={calculateSubtotal()}
-              shipping={calculateShipping(calculateSubtotal())}
-              tax={calculateTax(calculateSubtotal(), calculateShipping(calculateSubtotal()))}
-              total={calculateTotal()}
+              cartItems={state.items}
+              subtotal={getSubtotal()}
+              shipping={getShipping()}
+              tax={getTax()}
+              total={getTotalPrice()}
             />
           </div>
         </div>

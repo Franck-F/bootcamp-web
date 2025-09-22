@@ -82,19 +82,21 @@ export function CheckoutForm({ onNext }: CheckoutFormProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <MapPin className="w-5 h-5" />
+        <CardTitle className="flex items-center space-x-2 text-white">
+          <div className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg">
+            <MapPin className="w-5 h-5 text-white" />
+          </div>
           <span>Adresse de livraison</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 checkout-form">
           {/* Nom et prénom */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">Prénom *</Label>
+              <Label htmlFor="firstName" className="text-gray-300">Prénom *</Label>
               <div className="mt-1 relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -102,12 +104,12 @@ export function CheckoutForm({ onNext }: CheckoutFormProps) {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`pl-10 ${errors.firstName ? 'border-red-500' : ''}`}
+                  className={`pl-10 bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400 focus:ring-red-500/50 focus:border-red-500/50 ${errors.firstName ? 'border-red-500' : ''}`}
                   placeholder="Votre prénom"
                 />
               </div>
               {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                <p className="text-red-400 text-sm mt-1">{errors.firstName}</p>
               )}
             </div>
 
@@ -254,7 +256,10 @@ export function CheckoutForm({ onNext }: CheckoutFormProps) {
 
           {/* Actions */}
           <div className="flex justify-end space-x-4 pt-6">
-            <Button type="submit" className="flex items-center space-x-2">
+            <Button 
+              type="submit" 
+              className="flex items-center space-x-2 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-8 py-3 rounded-xl font-bold shadow-xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+            >
               <span>Continuer vers le paiement</span>
               <ArrowRight className="w-4 h-4" />
             </Button>

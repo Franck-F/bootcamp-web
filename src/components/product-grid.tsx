@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Star, ShoppingCart, Heart, Eye } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { useCart } from '@/store/cart-context'
+import { WishlistButton } from '@/components/wishlist-button'
 interface Product {
   id: number
   name: string
@@ -56,7 +57,6 @@ interface ProductGridProps {
 export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
   const router = useRouter()
   const { addItem } = useCart()
-  const [favorites, setFavorites] = useState<string[]>([])
   const [addingToCart, setAddingToCart] = useState<number | null>(null)
 
   const handleAddToCart = async (product: Product) => {
@@ -64,13 +64,26 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
     try {
       const availableVariant = product.variants.find(variant => variant.stock > 0)
       if (availableVariant) {
-        addItem({
+        await addItem({
           productId: product.id.toString(),
           size: availableVariant.size || 'Unique',
           quantity: 1,
           addedAt: new Date().toISOString(),
         })
+        
+        // Feedback visuel de succès
+        const button = document.querySelector(`[data-product-id="${product.id}"]`)
+        if (button) {
+          button.classList.add('bg-green-500')
+          setTimeout(() => {
+            button.classList.remove('bg-green-500')
+          }, 1000)
+        }
       }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout au panier:', error)
+      // Afficher un message d'erreur à l'utilisateur
+      alert('Erreur lors de l\'ajout au panier. Veuillez réessayer.')
     } finally {
       setAddingToCart(null)
     }
@@ -80,14 +93,6 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
     router.push(`/products/${productId}`)
   }
 
-  const toggleFavorite = (productId: number) => {
-    const idString = productId.toString()
-    setFavorites(prev => 
-      prev.includes(idString) 
-        ? prev.filter(id => id !== idString)
-        : [...prev, idString]
-    )
-  }
 
   const getAvailableSizes = (product: Product) => {
     return product.variants.filter(variant => variant.stock > 0)
@@ -175,7 +180,6 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
         {products.map((product) => {
           const availableSizes = getAvailableSizes(product)
           const isInStock = availableSizes.length > 0
-          const isFavorite = favorites.includes(product.id.toString())
 
           return (
             <Card key={product.id} className="group hover:shadow-lg transition-all duration-300">
@@ -231,14 +235,11 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
                       </div>
                       
                       <div className="flex space-x-2">
-                        <Button
+                        <WishlistButton 
+                          productId={product.id}
                           size="icon"
                           variant="ghost"
-                          onClick={() => toggleFavorite(product.id)}
-                          className={isFavorite ? 'text-red-500' : 'text-gray-400'}
-                        >
-                          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-                        </Button>
+                        />
                         <Button 
                           size="icon" 
                           variant="ghost"
@@ -250,9 +251,10 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
                           size="sm"
                           onClick={() => handleAddToCart(product)}
                           disabled={!isInStock || addingToCart === product.id}
+                          data-product-id={product.id}
                         >
                           <ShoppingCart className="w-4 h-4 mr-2" />
-                          Ajouter
+                          {addingToCart === product.id ? 'Ajout...' : 'Ajouter'}
                         </Button>
                       </div>
                     </div>
@@ -296,7 +298,6 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
       {products.map((product) => {
         const availableSizes = getAvailableSizes(product)
         const isInStock = availableSizes.length > 0
-        const isFavorite = favorites.includes(product.id.toString())
 
         return (
           <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
@@ -326,14 +327,12 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
               </div>
               
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
+                <WishlistButton 
+                  productId={product.id}
                   size="icon"
                   variant="secondary"
                   className="h-8 w-8"
-                  onClick={() => toggleFavorite(product.id)}
-                >
-                  <Heart className={`w-4 h-4 ${isFavorite ? 'text-red-500 fill-current' : ''}`} />
-                </Button>
+                />
               </div>
             </div>
 
@@ -383,7 +382,8 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
                     variant="ghost"
                     className="h-8 w-8"
                     onClick={() => handleAddToCart(product)}
-                    disabled={!isInStock}
+                    disabled={!isInStock || addingToCart === product.id}
+                    data-product-id={product.id}
                   >
                     <ShoppingCart className="w-4 h-4" />
                   </Button>

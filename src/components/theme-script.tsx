@@ -5,9 +5,9 @@ export function ThemeScript() {
         __html: `
           (function() {
             try {
-              const savedTheme = localStorage.getItem('theme');
+              const savedTheme = localStorage.getItem('vite-ui-theme') || 'system';
               const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-              const theme = savedTheme || systemTheme;
+              const theme = savedTheme === 'system' ? systemTheme : savedTheme;
               
               if (theme === 'dark') {
                 document.documentElement.classList.add('dark');

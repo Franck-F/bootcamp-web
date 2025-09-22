@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get('maxPrice')
     const brand = searchParams.get('brand')
     const sortBy = searchParams.get('sortBy')
+    const featured = searchParams.get('featured')
     
     const skip = (page - 1) * limit
     
@@ -37,6 +38,17 @@ export async function GET(request: NextRequest) {
       }
     }
     
+    if (featured === 'true') {
+      // Pour les produits featured, on prend les 3 premiers produits avec le plus de stock
+      where.variants = {
+        some: {
+          stock: {
+            gt: 0
+          }
+        }
+      }
+    }
+    
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -53,7 +65,10 @@ export async function GET(request: NextRequest) {
     
     // Construction du tri
     let orderBy: any = { created_at: 'desc' }
-    if (sortBy) {
+    if (featured === 'true') {
+      // Pour les produits featured, on trie par ID pour avoir des résultats cohérents
+      orderBy = { id: 'asc' }
+    } else if (sortBy) {
       switch (sortBy) {
         case 'newest':
           orderBy = { created_at: 'desc' }
@@ -97,6 +112,8 @@ export async function GET(request: NextRequest) {
     // Formatage des produits pour la réponse
     const formattedProducts = products.map(product => ({
       ...product,
+      price: Number(product.price), // S'assurer que le prix est un nombre
+      images: product.product_images?.map(img => img.image_url) || [],
       averageRating: 0, // Pas de reviews dans le schéma actuel
       totalReviews: 0,
     }))

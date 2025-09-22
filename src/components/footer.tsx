@@ -231,7 +231,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-gray-400 text-sm">
-                &copy; 2024 SneakPeak. Tous droits réservés.
+                &copy; {new Date().getFullYear()} SneakPeak. Tous droits réservés.
               </p>
               <p className="text-gray-500 text-xs mt-1">
                 SIRET: 123 456 789 00012 | TVA: FR12 123456789

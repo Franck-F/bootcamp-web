@@ -27,6 +27,15 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    
+    /* Variables personnalisées pour le thème clair */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --text-primary: 222.2 84% 4.9%;
+    --text-secondary: 215.4 16.3% 46.9%;
+    --bg-primary: 0 0% 100%;
+    --bg-secondary: 210 40% 96%;
+    --bg-accent: 210 40% 98%;
   }
 
   .dark {
@@ -49,6 +58,15 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+    
+    /* Variables personnalisées pour le thème sombre */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --text-primary: 210 40% 98%;
+    --text-secondary: 215 20.2% 65.1%;
+    --bg-primary: 222.2 84% 4.9%;
+    --bg-secondary: 217.2 32.6% 17.5%;
+    --bg-accent: 217.2 32.6% 17.5%;
   }
 }
 

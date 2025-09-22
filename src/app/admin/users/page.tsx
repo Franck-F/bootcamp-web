@@ -75,8 +75,8 @@ export default function UsersPage() {
           email: 'admin@sneakpeak.com',
           role: 'admin',
           status: 'active',
-          createdAt: '2024-01-01T00:00:00Z',
-          lastLogin: '2024-01-20T10:30:00Z',
+          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          lastLogin: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
           totalOrders: 0,
           totalSpent: 0
         },
@@ -86,8 +86,8 @@ export default function UsersPage() {
           email: 'jean.dupont@email.com',
           role: 'customer',
           status: 'active',
-          createdAt: '2024-01-15T10:30:00Z',
-          lastLogin: '2024-01-20T14:20:00Z',
+          createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+          lastLogin: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
           totalOrders: 3,
           totalSpent: 893.00
         },
@@ -97,8 +97,8 @@ export default function UsersPage() {
           email: 'marie.martin@email.com',
           role: 'customer',
           status: 'active',
-          createdAt: '2024-01-10T15:45:00Z',
-          lastLogin: '2024-01-19T09:15:00Z',
+          createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
+          lastLogin: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
           totalOrders: 7,
           totalSpent: 2156.50
         },
@@ -108,8 +108,8 @@ export default function UsersPage() {
           email: 'moderator@sneakpeak.com',
           role: 'moderator',
           status: 'active',
-          createdAt: '2024-01-05T12:00:00Z',
-          lastLogin: '2024-01-20T08:30:00Z',
+          createdAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+          lastLogin: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
           totalOrders: 0,
           totalSpent: 0
         },
@@ -119,8 +119,8 @@ export default function UsersPage() {
           email: 'banned@email.com',
           role: 'customer',
           status: 'banned',
-          createdAt: '2024-01-12T16:20:00Z',
-          lastLogin: '2024-01-18T11:45:00Z',
+          createdAt: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+          lastLogin: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
           totalOrders: 1,
           totalSpent: 299.00
         }

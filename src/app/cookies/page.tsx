@@ -35,7 +35,7 @@ export default function CookiesPage() {
             </h1>
 
             <p className="text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light">
-              Dernière mise à jour : 15 décembre 2024
+              Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function CookiesPage() {
                 <div className="flex items-center space-x-2 text-sm text-gray-400">
                   <span>Dernière mise à jour :</span>
                   <Badge variant="outline" className="border-gray-600 text-gray-400">
-                    15 décembre 2024
+                    {new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </Badge>
                 </div>
               </CardContent>

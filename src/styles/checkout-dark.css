@@ -1,0 +1,93 @@
+/* Styles pour le thème sombre du checkout */
+
+/* Labels */
+.checkout-form label {
+  @apply text-gray-300 font-medium;
+}
+
+/* Inputs */
+.checkout-form input {
+  @apply bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400 focus:ring-red-500/50 focus:border-red-500/50 transition-all duration-300;
+}
+
+.checkout-form input:focus {
+  @apply ring-2 ring-red-500/50 border-red-500/50;
+}
+
+/* Messages d'erreur */
+.checkout-form .error-message {
+  @apply text-red-400 text-sm mt-1;
+}
+
+/* Boutons de méthode de paiement */
+.payment-method-option {
+  @apply flex items-center space-x-3 p-4 border border-gray-600/50 rounded-xl hover:bg-gray-700/30 cursor-pointer transition-all duration-300;
+}
+
+.payment-method-option:hover {
+  @apply border-gray-500/50;
+}
+
+.payment-method-option.selected {
+  @apply border-red-500/50 bg-red-500/10;
+}
+
+/* Radio buttons */
+.payment-method-option input[type="radio"] {
+  @apply w-4 h-4 text-red-600 bg-gray-800 border-gray-600 focus:ring-red-500;
+}
+
+/* Badges de cartes */
+.payment-badges {
+  @apply flex space-x-2;
+}
+
+.payment-badges .badge {
+  @apply bg-gray-700/50 text-gray-300 border-gray-600/50 px-2 py-1 rounded text-xs;
+}
+
+/* Section de sécurité */
+.security-section {
+  @apply bg-gradient-to-r from-green-600/10 to-emerald-600/10 border border-green-600/20 rounded-xl p-4;
+}
+
+.security-section .security-icon {
+  @apply w-5 h-5 text-green-400;
+}
+
+.security-section .security-title {
+  @apply text-sm font-medium text-green-300;
+}
+
+.security-section .security-description {
+  @apply text-xs text-green-400/80;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .checkout-form .grid {
+    @apply grid-cols-1;
+  }
+  
+  .payment-method-option {
+    @apply p-3;
+  }
+  
+  .security-section {
+    @apply p-3;
+  }
+}

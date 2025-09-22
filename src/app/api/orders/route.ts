@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 // GET - Récupérer les commandes de l'utilisateur
 export async function GET(request: NextRequest) {
@@ -14,48 +15,57 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Pour simplifier, on retourne des commandes factices
-    // En production, on récupérerait depuis la base de données
-    const mockOrders = [
-      {
-        id: 1,
-        orderNumber: 'CMD-2024-001',
-        status: 'delivered',
-        paymentStatus: 'paid',
-        total: 405.00,
-        createdAt: '2024-01-15T10:30:00Z',
-        items: [
-          {
-            id: 1,
-            productName: 'Nike Air Force 1 \'Camo\'',
-            size: 'EU 44',
-            color: 'Noir',
-            quantity: 1,
-            unitPrice: 405.00
-          }
-        ]
+    // Récupérer les commandes depuis la base de données
+    const orders = await prisma.orders.findMany({
+      where: {
+        user_id: parseInt(session.user.id)
       },
-      {
-        id: 2,
-        orderNumber: 'CMD-2024-002',
-        status: 'shipped',
-        paymentStatus: 'paid',
-        total: 299.00,
-        createdAt: '2024-01-20T15:45:00Z',
-        items: [
-          {
-            id: 2,
-            productName: 'Nike KD 7 \'Away\'',
-            size: 'EU 43',
-            color: 'Blanc',
-            quantity: 1,
-            unitPrice: 299.00
+      include: {
+        order_items: {
+          include: {
+            variants: {
+              include: {
+                products: {
+                  include: {
+                    brands: true,
+                    product_images: true
+                  }
+                }
+              }
+            }
           }
-        ]
+        }
+      },
+      orderBy: {
+        created_at: 'desc'
       }
-    ]
+    })
 
-    return NextResponse.json(mockOrders)
+    // Transformer les données pour correspondre au format attendu
+    const formattedOrders = orders.map(order => ({
+      id: order.id,
+      orderNumber: order.order_number,
+      status: order.status,
+      paymentStatus: order.payment_status,
+      total: parseFloat(order.total.toString()),
+      subtotal: parseFloat(order.subtotal.toString()),
+      tax: parseFloat(order.tax.toString()),
+      shipping: parseFloat(order.shipping.toString()),
+      createdAt: order.created_at.toISOString(),
+      shippingAddress: order.shipping_address,
+      items: order.order_items.map(item => ({
+        id: item.id,
+        productName: item.variants.products.name,
+        brand: item.variants.products.brands?.name,
+        size: item.variants.size,
+        color: item.variants.color,
+        quantity: item.quantity,
+        unitPrice: parseFloat(item.unit_price.toString()),
+        image: item.variants.products.product_images?.[0]?.image_url
+      }))
+    }))
+
+    return NextResponse.json(formattedOrders)
     
   } catch (error) {
     console.error('Erreur lors de la récupération des commandes:', error)
@@ -79,42 +89,136 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { items, shippingAddress, paymentMethod } = body
+    const { cartItems, address, paymentMethod, subtotal, tax, shipping, total, transactionId } = body
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
+    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json(
         { error: 'Panier vide' },
         { status: 400 }
       )
     }
 
-    if (!shippingAddress) {
+    if (!address) {
       return NextResponse.json(
         { error: 'Adresse de livraison requise' },
         { status: 400 }
       )
     }
 
-    // Pour simplifier, on accepte toutes les commandes
-    // En production, on créerait la commande en base de données
-
-    const orderNumber = `CMD-2024-${Date.now()}`
-    const total = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0)
-
-    const newOrder = {
-      id: Date.now(),
-      orderNumber,
-      status: 'pending',
-      paymentStatus: 'pending',
-      total,
-      createdAt: new Date().toISOString(),
-      items,
-      shippingAddress
+    if (!paymentMethod) {
+      return NextResponse.json(
+        { error: 'Méthode de paiement requise' },
+        { status: 400 }
+      )
     }
+
+    // Générer un numéro de commande unique
+    const orderNumber = `CMD-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`
+    
+    // Créer la commande en base de données
+    const order = await prisma.orders.create({
+      data: {
+        user_id: parseInt(session.user.id),
+        order_number: orderNumber,
+        status: 'processing',
+        payment_status: 'paid',
+        subtotal: subtotal,
+        tax: tax,
+        shipping: shipping,
+        total: total,
+        shipping_address: JSON.stringify(address),
+        payment_method: paymentMethod.method,
+        transaction_id: transactionId,
+        created_at: new Date(),
+        updated_at: new Date()
+      }
+    })
+
+    // Créer les articles de la commande
+    for (const item of cartItems) {
+      // Trouver la variante correspondante
+      const variant = await prisma.variants.findFirst({
+        where: {
+          product_id: parseInt(item.productId),
+          size: item.size
+        }
+      })
+
+      if (variant) {
+        await prisma.order_items.create({
+          data: {
+            order_id: order.id,
+            variant_id: variant.id,
+            quantity: item.quantity,
+            unit_price: item.product?.price || 0,
+            created_at: new Date()
+          }
+        })
+
+        // Mettre à jour le stock
+        await prisma.variants.update({
+          where: {
+            id: variant.id
+          },
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          }
+        })
+      }
+    }
+
+    // Vider le panier de l'utilisateur
+    await prisma.cart_items.deleteMany({
+      where: {
+        user_id: parseInt(session.user.id)
+      }
+    })
+
+    // Simuler l'envoi d'email de confirmation
+    await simulateOrderConfirmationEmail(session.user.email!, orderNumber, total)
+
+    // Retourner la commande créée
+    const createdOrder = await prisma.orders.findUnique({
+      where: { id: order.id },
+      include: {
+        order_items: {
+          include: {
+            variants: {
+              include: {
+                products: {
+                  include: {
+                    brands: true,
+                    product_images: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
 
     return NextResponse.json({
       success: true,
-      order: newOrder,
+      order: {
+        id: createdOrder!.id,
+        orderNumber: createdOrder!.order_number,
+        status: createdOrder!.status,
+        paymentStatus: createdOrder!.payment_status,
+        total: parseFloat(createdOrder!.total.toString()),
+        createdAt: createdOrder!.created_at.toISOString(),
+        items: createdOrder!.order_items.map(item => ({
+          id: item.id,
+          productName: item.variants.products.name,
+          brand: item.variants.products.brands?.name,
+          size: item.variants.size,
+          quantity: item.quantity,
+          unitPrice: parseFloat(item.unit_price.toString()),
+          image: item.variants.products.product_images?.[0]?.image_url
+        }))
+      },
       message: 'Commande créée avec succès'
     })
     
@@ -124,5 +228,23 @@ export async function POST(request: NextRequest) {
       { error: 'Erreur interne du serveur' },
       { status: 500 }
     )
+  }
+}
+
+// Fonction pour simuler l'envoi d'email de confirmation
+async function simulateOrderConfirmationEmail(email: string, orderNumber: string, total: number) {
+  try {
+    console.log(`📧 Email de confirmation envoyé à ${email}`)
+    console.log(`📦 Commande: ${orderNumber}`)
+    console.log(`💰 Total: ${total}€`)
+    console.log(`📅 Date: ${new Date().toLocaleString('fr-FR')}`)
+    
+    // En production, on utiliserait un service d'email comme SendGrid, Mailgun, etc.
+    // await emailService.sendOrderConfirmation(email, orderNumber, total)
+    
+    return true
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi de l\'email:', error)
+    return false
   }
 }

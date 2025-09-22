@@ -97,6 +97,7 @@ model products {
   brands              brands                @relation(fields: [brand_id], references: [id])
   categories          categories            @relation(fields: [category_id], references: [id])
   variants            variants[]
+  wishlist_items      wishlist_items[]
 }
 
 model role_permissions {
@@ -141,6 +142,7 @@ model users {
   orders         orders[]
   shopping_carts shopping_carts[]
   user_sessions  user_sessions[]
+  wishlist_items wishlist_items[]
 }
 
 model variants {
@@ -154,6 +156,21 @@ model variants {
   order_items    order_items[]
   shopping_carts shopping_carts[]
   products       products         @relation(fields: [product_id], references: [id])
+}
+
+model wishlist_items {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  products   products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, product_id])
+  @@index([user_id])
+  @@index([product_id])
 }
 
 enum order_status {

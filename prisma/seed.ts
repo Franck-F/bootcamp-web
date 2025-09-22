@@ -214,7 +214,7 @@ async function main() {
   // Créer quelques commandes d'exemple
   const order1 = await prisma.orders.create({
     data: {
-      order_number: 'CMD-2024001-ABC123',
+      order_number: `CMD-${new Date().getFullYear()}001-ABC123`,
       user_id: customer.id,
       status: order_status.delivered,
       payment_status: payment_status.pending,
@@ -235,7 +235,7 @@ async function main() {
 
   const order2 = await prisma.orders.create({
     data: {
-      order_number: 'CMD-2024002-DEF456',
+      order_number: `CMD-${new Date().getFullYear()}002-DEF456`,
       user_id: customer.id,
       status: order_status.pending,
       payment_status: payment_status.pending,

@@ -1,8 +1,15 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
+import { securityMiddleware } from './middleware/security'
 
 export default withAuth(
   function middleware(req) {
+    // Appliquer le middleware de sécurité en premier
+    const securityResponse = securityMiddleware(req)
+    if (securityResponse) {
+      return securityResponse
+    }
+
     const token = req.nextauth.token
     const isAuth = !!token
     const isAuthPage = req.nextUrl.pathname.startsWith('/auth')
@@ -55,6 +62,9 @@ export const config = {
     '/auth/:path*',
     '/checkout/:path*',
     '/orders/:path*',
-    '/profile/:path*'
+    '/profile/:path*',
+    '/api/payment/:path*',
+    '/api/orders/:path*',
+    '/api/cart/:path*'
   ]
 }
