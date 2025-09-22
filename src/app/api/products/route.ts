@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     const brand = searchParams.get('brand')
     const sortBy = searchParams.get('sortBy')
     const featured = searchParams.get('featured')
+    const isNew = searchParams.get('new')
+    const sale = searchParams.get('sale')
     
     const skip = (page - 1) * limit
     
@@ -43,6 +45,16 @@ export async function GET(request: NextRequest) {
       where.featured = true
     }
     
+    if (isNew === 'true') {
+      // Pour les produits nouveaux
+      where.isNew = true
+    }
+    
+    if (sale === 'true') {
+      // Pour les produits en solde
+      where.onSale = true
+    }
+    
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -57,7 +69,10 @@ export async function GET(request: NextRequest) {
       if (maxPrice) where.price.lte = parseFloat(maxPrice)
     }
     
-    // Construction du tri
+    // Marques prioritaires selon les catégories
+    const priorityBrands = ['Nike', 'Adidas', 'Air Jordan', 'Puma', 'New Balance', 'Converse', 'Vans']
+    
+    // Construction du tri avec priorité des marques
     let orderBy: any = { created_at: 'desc' }
     if (featured === 'true') {
       // Pour les produits featured, on trie par ID pour avoir des résultats cohérents
@@ -87,21 +102,48 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    const [products, total] = await Promise.all([
+    // Récupérer d'abord les produits des marques prioritaires
+    const priorityWhere = {
+      ...where,
+      brands: {
+        name: { in: priorityBrands }
+      }
+    }
+    
+    const [priorityProducts, otherProducts, total] = await Promise.all([
       prisma.products.findMany({
-        where,
+        where: priorityWhere,
         include: {
           variants: true,
           brands: true,
           categories: true,
           product_images: true,
         },
-        skip,
-        take: limit,
+        orderBy
+      }),
+      prisma.products.findMany({
+        where: {
+          ...where,
+          brands: {
+            name: { notIn: priorityBrands }
+          }
+        },
+        include: {
+          variants: true,
+          brands: true,
+          categories: true,
+          product_images: true,
+        },
         orderBy
       }),
       prisma.products.count({ where })
     ])
+    
+    // Combiner les produits en priorisant les marques prioritaires
+    const allProducts = [...priorityProducts, ...otherProducts]
+    
+    // Appliquer la pagination sur la liste combinée
+    const products = allProducts.slice(skip, skip + limit)
     
     // Formatage des produits pour la réponse
     const formattedProducts = products.map(product => ({
