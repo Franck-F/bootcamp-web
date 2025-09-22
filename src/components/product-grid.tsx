@@ -101,40 +101,34 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
   const formatSize = (sizeString: string, category?: string) => {
     if (!sizeString) return 'Unique'
     
-    // Pour les enfants, utiliser les normes européennes spécifiques
-    if (category === 'Infant/Toddler Shoes' || category?.toLowerCase().includes('enfant')) {
-      // Extraire la taille EU (normes européennes pour enfants)
-      const euMatch = sizeString.match(/EU (\d+(?:\.\d+)?)/)
-      if (euMatch) {
-        const euSize = parseFloat(euMatch[1])
-        // Tailles enfants EU typiques : 18-35
-        if (euSize >= 18 && euSize <= 35) {
-          return `EU ${euSize}`
-        }
-      }
-      
-      // Si pas de EU, essayer US et convertir
-      const usMatch = sizeString.match(/US (\d+(?:\.\d+)?)/)
-      if (usMatch) {
-        const usSize = parseFloat(usMatch[1])
-        // Conversion approximative US vers EU pour enfants
-        const euSize = Math.round(usSize + 18)
-        if (euSize >= 18 && euSize <= 35) {
-          return `EU ${euSize}`
-        }
-      }
-    }
-    
-    // Pour les adultes, priorité EU puis US
+    // Extraire la taille EU (normes européennes) - priorité absolue
     const euMatch = sizeString.match(/EU (\d+(?:\.\d+)?)/)
     if (euMatch) {
       return `EU ${euMatch[1]}`
     }
     
-    // Si pas de EU, essayer US
+    // Si pas de EU, essayer de convertir depuis US
     const usMatch = sizeString.match(/US (\d+(?:\.\d+)?)/)
     if (usMatch) {
-      return `US ${usMatch[1]}`
+      const usSize = parseFloat(usMatch[1])
+      
+      // Pour les enfants
+      if (category === 'Infant/Toddler Shoes' || category?.toLowerCase().includes('enfant')) {
+        const euSize = Math.round(usSize + 18)
+        if (euSize >= 18 && euSize <= 35) {
+          return `EU ${euSize}`
+        }
+      }
+      
+      // Pour les adultes - conversion approximative US vers EU
+      if (usSize >= 3 && usSize <= 15) {
+        const euSize = Math.round(usSize + 33)
+        if (euSize >= 36 && euSize <= 48) {
+          return `EU ${euSize}`
+        }
+      }
+      
+      return `US ${usSize}`
     }
     
     // Si rien ne correspond, retourner les 10 premiers caractères

@@ -162,16 +162,34 @@ export default function ProductDetailsPage() {
   const formatSize = (sizeString: string) => {
     if (!sizeString) return 'Unique'
     
-    // Extraire la taille EU (normes européennes)
+    // Extraire la taille EU (normes européennes) - priorité absolue
     const euMatch = sizeString.match(/EU (\d+(?:\.\d+)?)/)
     if (euMatch) {
       return `EU ${euMatch[1]}`
     }
     
-    // Si pas de EU, essayer US
+    // Si pas de EU, essayer de convertir depuis US
     const usMatch = sizeString.match(/US (\d+(?:\.\d+)?)/)
     if (usMatch) {
-      return `US ${usMatch[1]}`
+      const usSize = parseFloat(usMatch[1])
+      
+      // Pour les enfants
+      if (product?.categories?.name === 'Infant/Toddler Shoes' || product?.categories?.name?.toLowerCase().includes('enfant')) {
+        const euSize = Math.round(usSize + 18)
+        if (euSize >= 18 && euSize <= 35) {
+          return `EU ${euSize}`
+        }
+      }
+      
+      // Pour les adultes - conversion approximative US vers EU
+      if (usSize >= 3 && usSize <= 15) {
+        const euSize = Math.round(usSize + 33)
+        if (euSize >= 36 && euSize <= 48) {
+          return `EU ${euSize}`
+        }
+      }
+      
+      return `US ${usSize}`
     }
     
     // Si rien ne correspond, retourner les 10 premiers caractères

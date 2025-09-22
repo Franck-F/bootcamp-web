@@ -208,7 +208,7 @@ export function Navigation() {
                   <Button variant="ghost">Connexion</Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button>Inscription</Button>
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white">Inscription</Button>
                 </Link>
               </div>
             )}
@@ -309,7 +309,7 @@ export function Navigation() {
                       <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">Connexion</Button>
                     </Link>
                     <Link href="/auth/signup">
-                      <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">Inscription</Button>
+                      <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">Inscription</Button>
                     </Link>
                   </div>
                 )}
