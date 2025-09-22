@@ -179,7 +179,7 @@ export default function ProductsPage() {
               ) : (
                 <>
                   Tous nos{' '}
-                  <span className="bg-gradient-to-r from-red-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
                     produits
                   </span>
                 </>
@@ -233,7 +233,7 @@ export default function ProductsPage() {
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
                   size="lg"
                   onClick={() => setViewMode('grid')}
-                  className={`rounded-r-none ${viewMode === 'grid' ? 'bg-red-600 hover:bg-red-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                  className={`rounded-r-none ${viewMode === 'grid' ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
                 >
                   <Grid className="w-5 h-5" />
                 </Button>
@@ -241,7 +241,7 @@ export default function ProductsPage() {
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
                   size="lg"
                   onClick={() => setViewMode('list')}
-                  className={`rounded-l-none ${viewMode === 'list' ? 'bg-red-600 hover:bg-red-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                  className={`rounded-l-none ${viewMode === 'list' ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
                 >
                   <List className="w-5 h-5" />
                 </Button>
@@ -319,7 +319,7 @@ export default function ProductsPage() {
                 <Button
                   onClick={loadMoreProducts}
                   disabled={loadingMore}
-                  className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300"
+                  className="bg-gradient-to-r from-orange-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300"
                 >
                   {loadingMore ? (
                     <>

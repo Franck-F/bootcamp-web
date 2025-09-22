@@ -1,5 +1,7 @@
 /* Styles pour le thème sombre du checkout */
 
+
+
 /* Labels */
 .checkout-form label {
   @apply text-gray-300 font-medium;

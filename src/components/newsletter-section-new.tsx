@@ -67,14 +67,11 @@ export function NewsletterSectionNew() {
       <div className="w-full px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center space-x-2 bg-red-600/20 backdrop-blur-sm border border-red-600/30 rounded-full px-4 py-2 mb-6">
-            <Crown className="w-4 h-4 text-red-400" />
-            <span className="text-sm font-medium text-red-400">Avantages Premium</span>
-          </div>
+          
           
           <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
             Pourquoi choisir{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-pink-400">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-orange-400">
               SneakPeak
             </span>
           </h2>

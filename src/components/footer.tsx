@@ -14,8 +14,12 @@ export function Footer() {
           {/* Logo et description */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                <span className="text-black font-bold text-xl">S</span>
+              <div className="w-5 h-5 g-white rounded-xl flex items-center justify-center">
+                <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
               </div>
               <span className="text-2xl font-bold text-white">SneakPeak</span>
             </div>
@@ -31,9 +35,9 @@ export function Footer() {
                 <Input
                   type="email"
                   placeholder="Votre email"
-                  className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
+                  className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500"
                 />
-                <Button className="bg-red-600 hover:bg-red-700 text-white px-6">
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white px-6">
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -131,7 +135,7 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                <Truck className="w-6 h-6 text-red-500" />
+                <Truck className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <h5 className="font-semibold text-white">Livraison gratuite</h5>
@@ -141,7 +145,7 @@ export function Footer() {
             
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-red-500" />
+                <Shield className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <h5 className="font-semibold text-white">Paiement sécurisé</h5>
@@ -151,7 +155,7 @@ export function Footer() {
             
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                <Headphones className="w-6 h-6 text-red-500" />
+                <Headphones className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <h5 className="font-semibold text-white">Support 24/7</h5>
@@ -161,7 +165,7 @@ export function Footer() {
             
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-red-500" />
+                <CreditCard className="w-6 h-6 text-orange-500" />
               </div>
               <div>
                 <h5 className="font-semibold text-white">Retours faciles</h5>
@@ -180,13 +184,13 @@ export function Footer() {
             <div>
               <h4 className="text-lg font-semibold text-white mb-6">Suivez-nous</h4>
               <div className="flex space-x-4">
-                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors group">
+                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-orange-600 transition-colors group">
                   <Facebook className="w-6 h-6 text-gray-400 group-hover:text-white" />
                 </a>
-                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors group">
+                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-orange-600 transition-colors group">
                   <Twitter className="w-6 h-6 text-gray-400 group-hover:text-white" />
                 </a>
-                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors group">
+                <a href="#" className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-orange-600 transition-colors group">
                   <Instagram className="w-6 h-6 text-gray-400 group-hover:text-white" />
                 </a>
               </div>
@@ -197,15 +201,15 @@ export function Footer() {
               <h4 className="text-lg font-semibold text-white mb-6">Contact</h4>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <Mail className="w-5 h-5 text-red-500" />
+                  <Mail className="w-5 h-5 text-orange-500" />
                   <span className="text-gray-400">contact@sneakpeak.fr</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Phone className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-400">01 23 45 67 89</span>
+                  <Phone className="w-5 h-5 text-orange-500" />
+                  <span className="text-gray-400">01 04 05 06 07</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <MapPin className="w-5 h-5 text-red-500" />
+                  <MapPin className="w-5 h-5 text-orange-500" />
                   <span className="text-gray-400">123 Rue de la Mode, 75001 Paris</span>
                 </div>
               </div>

@@ -27,8 +27,13 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: 'Sneakers Store - E-commerce Moderne',
+  title: 'SneakPeak',
   description: 'Boutique en ligne de sneakers avec gestion de stock avancée',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/apple-touch-icon.png',
+  },
   keywords: 'sneakers, chaussures, e-commerce, mode',
   authors: [{ name: 'Sneakers Store' }],
   openGraph: {

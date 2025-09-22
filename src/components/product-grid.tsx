@@ -340,7 +340,7 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
               <div className="mb-2">
                 <p className="product-brand">{product.brands.name}</p>
                 <Link href={`/products/${product.id}`}>
-                  <h3 className="product-title hover:text-blue-600 transition-colors line-clamp-2">
+                  <h3 className="product-title hover:text-cyan-100 transition-colors line-clamp-2">
                     {product.name}
                   </h3>
                 </Link>

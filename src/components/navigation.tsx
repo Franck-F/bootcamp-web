@@ -8,11 +8,11 @@ import { useWishlist } from '@/store/wishlist-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CartSidebar } from '@/components/cart-sidebar'
-import { 
-  ShoppingCart, 
-  User, 
-  Menu, 
-  X, 
+import {
+  ShoppingCart,
+  User,
+  Menu,
+  X,
   Search,
   Heart,
   Package,
@@ -21,12 +21,14 @@ import {
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SearchBar } from '@/components/search-bar'
+import { usePathname } from 'next/navigation' // ✅ Import bien placé
 
 export function Navigation() {
   const { data: session } = useSession()
   const { getTotalItems, toggleCart } = useCart()
   const { getWishlistCount } = useWishlist()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname() // ✅ Hook bien placé
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' })
@@ -37,38 +39,87 @@ export function Navigation() {
   const isCustomer = session?.user?.role === 'customer'
 
   return (
-    <nav className="bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-lg sticky top-0 z-40">
+    <nav className="bg-black/50 backdrop-blur-lg border-b border-gray-800 shadow-xl sticky top-0 z-40">
+
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-lg">S</span>
+            <div className="logo-container w-9 h-9 ">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <span className="text-xl font-bold text-white">SneakPeak</span>
+            
           </Link>
 
-              {/* Navigation principale - Desktop */}
-              <div className="hidden md:flex items-center space-x-8">
-                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
-                  Produits
-                </Link>
-                <Link href="/products/homme" className="text-gray-300 hover:text-white transition-colors">
-                  Homme
-                </Link>
-                <Link href="/products/femme" className="text-gray-300 hover:text-white transition-colors">
-                  Femme
-                </Link>
-                <Link href="/products/enfant" className="text-gray-300 hover:text-white transition-colors">
-                  Enfant
-                </Link>
-                <Link href="/products/nouveautes" className="text-gray-300 hover:text-white transition-colors">
-                  Nouveautés
-                </Link>
-                <Link href="/products/soldes" className="text-red-400 hover:text-red-300 transition-colors font-semibold">
-                  Soldes
-                </Link>
-              </div>
+
+
+          {/* Navigation principale - Desktop */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/products"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-gray-300 hover:text-orange-500'
+              }`}
+            >
+              Produits
+            </Link>
+            <Link
+              href="/products/homme"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products/homme'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-gray-300 hover:text-orange-500'
+              }`}
+            >
+              Homme
+            </Link>
+            <Link
+              href="/products/femme"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products/femme'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-gray-300 hover:text-orange-500'
+              }`}
+            >
+              Femme
+            </Link>
+            <Link
+              href="/products/enfant"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products/enfant'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-gray-300 hover:text-orange-500'
+              }`}
+            >
+              Enfant
+            </Link>
+            <Link
+              href="/products/nouveautes"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products/nouveautes'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-gray-300 hover:text-orange-500'
+              }`}
+            >
+              Nouveautés
+            </Link>
+            <Link
+              href="/products/soldes"
+              className={`transition-all duration-300 transform hover:scale-105 ${
+                pathname === '/products/soldes'
+                  ? 'text-orange-500 font-semibold'
+                  : 'text-red-400 hover:text-orange-500 font-semibold'
+              }`}
+            >
+              Soldes
+            </Link>
+          </div>
 
           {/* Actions - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
@@ -93,8 +144,7 @@ export function Navigation() {
               </Button>
             </Link>
 
-            {/* Basculement de thème */}
-            <ThemeToggle />
+            
 
             {/* Panier */}
             <Button variant="ghost" size="icon" onClick={toggleCart} className="relative text-gray-300 hover:text-white">

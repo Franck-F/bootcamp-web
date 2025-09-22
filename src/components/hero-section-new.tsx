@@ -38,7 +38,7 @@ export function HeroSectionNew() {
   }
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-black dark:to-gray-800 overflow-hidden">                                              
+    <section  className="relative min-h-screen pt-4 bg-gradient-to-r from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-black dark:to-gray-800 overflow-hidden">                                              
       {/* Background Elements - Nike Style */}
       <div className="absolute inset-0">
         {/* Subtle Nike Swoosh Logo */}
@@ -53,16 +53,11 @@ export function HeroSectionNew() {
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200/20 dark:via-black/20 to-transparent"></div>
       </div>
 
-      <div className="relative w-full px-4 sm:px-6 lg:px-8 py-20 min-h-screen flex items-center">                                                               
+      <div className="relative min-h-[10vh] flex items-center">                                                              
         <div className="grid lg:grid-cols-2 gap-16 items-center w-full max-w-[90%] mx-auto">                                                                    
           {/* Left Side - Content */}
           <div className="space-y-10 z-10">
-            {/* Collection Badge */}
-            <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-red-600/20 to-pink-600/20 dark:from-red-600/20 dark:to-pink-600/20 backdrop-blur-sm border border-red-500/30 dark:border-red-500/30 rounded-full px-6 py-3">                                                               
-              <Crown className="w-5 h-5 text-red-400 dark:text-red-400" />
-              <span className="text-sm font-semibold text-gray-800 dark:text-white">Collection Premium {new Date().getFullYear()}</span>                                                                 
-              <Sparkles className="w-4 h-4 text-yellow-400 dark:text-yellow-400" />
-            </div>
+            
 
             {/* Main Headline - Nike Style */}
             <div className="space-y-6">
@@ -81,8 +76,10 @@ export function HeroSectionNew() {
             {/* CTA Button - Nike Style */}
             <div className="flex flex-col sm:flex-row gap-6">
               <Link href="/products">
-                <Button size="lg" className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white px-10 py-6 text-xl font-bold rounded-none shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105">                                                      
+                <Button size="lg" className="bg-white text-black hover:bg-orange-500 hover:text-black px-10 py-6 text-xl font-bold rounded-lg shadow-2xl hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105">                                                      
                   Explorer la collection
+                  
+
                   <ArrowRight className="ml-3 w-6 h-6" />
                 </Button>
               </Link>
@@ -100,7 +97,7 @@ export function HeroSectionNew() {
                 </div>
               </div>
               <div className="text-white text-sm">
-                <div>120k Total Review</div>
+                <div>120k Total Re</div>
               </div>
             </div>
 
@@ -116,21 +113,22 @@ export function HeroSectionNew() {
           <div className="relative z-10">
             {/* Main Product Image */}
             <div className="relative">
-              <div className="relative h-[600px] w-full">
+              <div className="relative h-[800px] w-full">
                 <Image
-                  src={featuredProduct.image}
-                  alt={featuredProduct.name}
-                  fill
-                  className="object-contain transform rotate-12 hover:rotate-6 transition-transform duration-500"                                                      
-                  priority
-                  style={{
-                    filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) brightness(1.3) contrast(1.5) saturate(1.2)',
-                    backgroundColor: 'transparent',
-                    mixBlendMode: 'multiply',
-                    WebkitFilter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) brightness(1.3) contrast(1.5) saturate(1.2)',
-                    background: 'transparent'
-                  }}
-                />
+                src="/fashion-shoes-sneakers.png" // ← Ton image perso ici
+                alt="Mon produit personnalisé"
+                fill
+                className="object-contain transform rotate-12 hover:rotate-6 transition-transform duration-500"
+                priority
+                style={{
+                  filter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) brightness(1.3) contrast(1.5) saturate(1.2)',
+                  backgroundColor: 'transparent',
+                  mixBlendMode: 'multiply',
+                  WebkitFilter: 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5)) brightness(1.3) contrast(1.5) saturate(1.2)',
+                  background: 'transparent'
+                }}
+               />
+
               </div>
             </div>
 
