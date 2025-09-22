@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model brands {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  logo_url   String?
+  created_at DateTime   @default(now())
+  products   products[]
+}
+
+model categories {
+  id                  Int                   @id @default(autoincrement())
+  name                String                @unique
+  sku                 String?               @unique
+  created_at          DateTime              @default(now())
+  categories_products categories_products[]
+  products            products[]
+}
+
+model categories_products {
+  category_id Int
+  product_id  Int
+  categories  categories @relation(fields: [category_id], references: [id])
+  products    products   @relation(fields: [product_id], references: [id])
+
+  @@id([category_id, product_id])
+}
+
+model order_items {
+  id                 Int      @id @default(autoincrement())
+  order_id           Int
+  product_variant_id Int
+  quantity           Int
+  unit_price         Decimal  @db.Decimal(10, 2)
+  created_at         DateTime @default(now())
+  orders             orders   @relation(fields: [order_id], references: [id])
+  variants           variants @relation(fields: [product_variant_id], references: [id])
+}
+
+model orders {
+  id                Int            @id @default(autoincrement())
+  user_id           Int
+  order_number      String         @unique
+  status            order_status   @default(pending)
+  total_amount      Decimal        @db.Decimal(10, 2)
+  shipping_address  String?
+  payment_method    String?
+  payment_status    payment_status @default(pending)
+  payment_intent_id String?
+  created_at        DateTime       @default(now())
+  updated_at        DateTime
+  billing_address   String?
+  order_items       order_items[]
+  users             users          @relation(fields: [user_id], references: [id])
+}
+
+model permissions {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  description      String?
+  role_permissions role_permissions[]
+}
+
+model product_images {
+  id            Int      @id @default(autoincrement())
+  product_id    Int
+  image_url     String
+  alt_text      String?
+  is_primary    Boolean  @default(false)
+  display_order Int      @default(0)
+  products      products @relation(fields: [product_id], references: [id])
+}
+
+model products {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  description         String?
+  price               Decimal               @db.Decimal(10, 2)
+  brand_id            Int
+  category_id         Int
+  sku                 String?               @unique
+  featured            Boolean               @default(false)
+  isNew               Boolean               @default(false)
+  onSale              Boolean               @default(false)
+  originalPrice       Decimal?              @db.Decimal(10, 2)
+  created_at          DateTime              @default(now())
+  is_active           Boolean               @default(true)
+  categories_products categories_products[]
+  product_images      product_images[]
+  brands              brands                @relation(fields: [brand_id], references: [id])
+  categories          categories            @relation(fields: [category_id], references: [id])
+  variants            variants[]
+  wishlist_items      wishlist_items[]
+}
+
+model role_permissions {
+  role          roles
+  permission_id Int
+  permissions   permissions @relation(fields: [permission_id], references: [id])
+
+  @@id([role, permission_id])
+}
+
+model shopping_carts {
+  id                 Int      @id @default(autoincrement())
+  user_id            Int
+  product_variant_id Int
+  quantity           Int
+  created_at         DateTime @default(now())
+  updated_at         DateTime
+  variants           variants @relation(fields: [product_variant_id], references: [id])
+  users              users    @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, product_variant_id])
+}
+
+model user_sessions {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token_hash String?
+  created_at DateTime @default(now())
+  users      users    @relation(fields: [user_id], references: [id])
+}
+
+model users {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password_hash  String
+  name           String?
+  role           roles            @default(customer)
+  is_active      Boolean          @default(true)
+  email_verified Boolean          @default(false)
+  created_at     DateTime         @default(now())
+  updated_at     DateTime
+  orders         orders[]
+  shopping_carts shopping_carts[]
+  user_sessions  user_sessions[]
+  wishlist_items wishlist_items[]
+}
+
+model variants {
+  id             Int              @id @default(autoincrement())
+  product_id     Int
+  size           String?
+  color          String?
+  price          Decimal          @db.Decimal(10, 2)
+  stock          Int              @default(0)
+  created_at     DateTime         @default(now())
+  order_items    order_items[]
+  shopping_carts shopping_carts[]
+  products       products         @relation(fields: [product_id], references: [id])
+}
+
+model wishlist_items {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  products   products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  
+  @@unique([user_id, product_id])
+  @@index([user_id])
+  @@index([product_id])
+}
+
+enum order_status {
+  pending
+  shipped
+  delivered
+  canceled
+}
+
+enum payment_status {
+  pending
+  failed
+  refunded
+}
+
+enum roles {
+  customer
+  moderator
+  admin
+}
