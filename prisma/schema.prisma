@@ -134,6 +134,11 @@ model users {
   email          String           @unique
   password_hash  String
   name           String?
+  phone          String?
+  address        String?
+  city           String?
+  postal_code    String?
+  country        String?
   role           roles            @default(customer)
   is_active      Boolean          @default(true)
   email_verified Boolean          @default(false)
