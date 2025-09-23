@@ -409,12 +409,22 @@ export default function ProductPage() {
               {/* Tailles */}
               {getAvailableSizes().length > 0 && (
                 <div>
-                  <h3 className="text-white font-semibold mb-4 text-lg">Taille (EU)</h3>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-white font-bold text-xl">Sélectionnez votre taille</h3>
+                    <div className="flex items-center space-x-2 text-sm text-gray-400">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span>Disponible</span>
+                      <div className="w-3 h-3 rounded-full bg-gray-600 ml-4"></div>
+                      <span>Indisponible</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3">
                     {getAvailableSizes().map((size) => {
                       const variants = getVariantsBySize(size)
                       const isAvailable = variants.some(v => v.stock > 0)
                       const isSelected = selectedSize === size
+                      const stockCount = variants.reduce((sum, v) => sum + v.stock, 0)
                       
                       return (
                         <button
@@ -428,18 +438,60 @@ export default function ProductPage() {
                             }
                           }}
                           disabled={!isAvailable}
-                          className={`p-4 rounded-lg border-2 text-center font-medium transition-all ${
+                          className={`group relative p-4 rounded-xl border-2 text-center font-bold transition-all duration-300 transform hover:scale-105 ${
                             isSelected
-                              ? 'border-orange-500 bg-orange-500/10 text-orange-500'
+                              ? 'border-orange-500 bg-gradient-to-br from-orange-500/20 to-orange-600/20 text-orange-400 shadow-lg shadow-orange-500/25'
                               : isAvailable
-                              ? 'border-gray-600 text-white hover:border-gray-500 hover:bg-gray-800'
-                              : 'border-gray-700 text-gray-500 cursor-not-allowed opacity-50'
+                              ? 'border-gray-600 text-white hover:border-orange-400 hover:bg-gradient-to-br hover:from-gray-800/50 hover:to-gray-700/50 hover:shadow-lg hover:shadow-gray-500/10'
+                              : 'border-gray-700 text-gray-500 cursor-not-allowed opacity-40'
                           }`}
                         >
-                          {formatSize(size)}
+                          {/* Indicateur de disponibilité */}
+                          <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
+                            isAvailable ? 'bg-green-500' : 'bg-gray-600'
+                          }`}></div>
+                          
+                          {/* Taille principale */}
+                          <div className="text-lg font-black">
+                            {formatSize(size)}
+                          </div>
+                          
+                          {/* Stock disponible */}
+                          {isAvailable && stockCount > 0 && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {stockCount} en stock
+                            </div>
+                          )}
+                          
+                          {/* Effet de sélection */}
+                          {isSelected && (
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-600/10 animate-pulse"></div>
+                          )}
                         </button>
                       )
                     })}
+                  </div>
+                  
+                  {/* Guide des tailles */}
+                  <div className="mt-6 p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      <h4 className="text-white font-semibold text-sm">Guide des tailles</h4>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-400">
+                      <div>
+                        <span className="text-white font-medium">EU 36-38:</span> Petite
+                      </div>
+                      <div>
+                        <span className="text-white font-medium">EU 39-41:</span> Moyenne
+                      </div>
+                      <div>
+                        <span className="text-white font-medium">EU 42-44:</span> Grande
+                      </div>
+                      <div>
+                        <span className="text-white font-medium">EU 45+:</span> Très grande
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -447,12 +499,22 @@ export default function ProductPage() {
               {/* Couleurs */}
               {getAvailableColors().length > 0 && (
                 <div>
-                  <h3 className="text-white font-semibold mb-4 text-lg">Couleur</h3>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-white font-bold text-xl">Couleur</h3>
+                    <div className="flex items-center space-x-2 text-sm text-gray-400">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span>Disponible</span>
+                      <div className="w-3 h-3 rounded-full bg-gray-600 ml-4"></div>
+                      <span>Indisponible</span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     {getAvailableColors().map((color) => {
                       const variants = getVariantsByColor(color)
                       const isAvailable = variants.some(v => v.stock > 0)
                       const isSelected = selectedColor === color
+                      const stockCount = variants.reduce((sum, v) => sum + v.stock, 0)
                       
                       return (
                         <button
@@ -466,15 +528,35 @@ export default function ProductPage() {
                             }
                           }}
                           disabled={!isAvailable}
-                          className={`px-6 py-3 rounded-lg border-2 font-medium transition-all ${
+                          className={`group relative p-4 rounded-xl border-2 text-center font-semibold transition-all duration-300 transform hover:scale-105 ${
                             isSelected
-                              ? 'border-orange-500 bg-orange-500/10 text-orange-500'
+                              ? 'border-orange-500 bg-gradient-to-br from-orange-500/20 to-orange-600/20 text-orange-400 shadow-lg shadow-orange-500/25'
                               : isAvailable
-                              ? 'border-gray-600 text-white hover:border-gray-500 hover:bg-gray-800'
-                              : 'border-gray-700 text-gray-500 cursor-not-allowed opacity-50'
+                              ? 'border-gray-600 text-white hover:border-orange-400 hover:bg-gradient-to-br hover:from-gray-800/50 hover:to-gray-700/50 hover:shadow-lg hover:shadow-gray-500/10'
+                              : 'border-gray-700 text-gray-500 cursor-not-allowed opacity-40'
                           }`}
                         >
-                          {color}
+                          {/* Indicateur de disponibilité */}
+                          <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
+                            isAvailable ? 'bg-green-500' : 'bg-gray-600'
+                          }`}></div>
+                          
+                          {/* Nom de la couleur */}
+                          <div className="text-base font-bold">
+                            {color}
+                          </div>
+                          
+                          {/* Stock disponible */}
+                          {isAvailable && stockCount > 0 && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              {stockCount} en stock
+                            </div>
+                          )}
+                          
+                          {/* Effet de sélection */}
+                          {isSelected && (
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/10 to-orange-600/10 animate-pulse"></div>
+                          )}
                         </button>
                       )
                     })}
@@ -484,31 +566,65 @@ export default function ProductPage() {
 
               {/* Quantité */}
               <div>
-                <h3 className="text-white font-semibold mb-4 text-lg">Quantité</h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-white font-bold text-xl">Quantité</h3>
+                  {selectedVariant && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-gray-400">
+                        {selectedVariant.stock} disponible{selectedVariant.stock > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="flex items-center space-x-6">
-                  <div className="flex items-center border border-gray-600 rounded-lg bg-gray-900">
+                  <div className="flex items-center border-2 border-gray-600 rounded-xl bg-gray-900/50 backdrop-blur-sm">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="text-white hover:bg-gray-800 px-4 py-3"
+                      className="text-white hover:bg-orange-500/20 hover:text-orange-400 px-6 py-4 transition-all duration-200"
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus className="w-5 h-5" />
                     </Button>
-                    <span className="px-6 py-3 text-white font-medium text-lg">{quantity}</span>
+                    <div className="px-8 py-4 text-white font-bold text-xl border-x border-gray-600">
+                      {quantity}
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setQuantity(Math.min(selectedVariant?.stock || 1, quantity + 1))}
-                      className="text-white hover:bg-gray-800 px-4 py-3"
+                      className="text-white hover:bg-orange-500/20 hover:text-orange-400 px-6 py-4 transition-all duration-200"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-5 h-5" />
                     </Button>
                   </div>
                   
+                  {/* Indicateur de stock */}
                   {selectedVariant && (
-                    <div className="text-gray-400 text-sm">
-                      <span className="font-medium">{selectedVariant.stock}</span> en stock
+                    <div className="flex items-center space-x-3">
+                      {selectedVariant.stock > 10 ? (
+                        <div className="flex items-center space-x-2 text-green-400">
+                          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                          <span className="text-sm font-medium">Stock élevé</span>
+                        </div>
+                      ) : selectedVariant.stock > 5 ? (
+                        <div className="flex items-center space-x-2 text-yellow-400">
+                          <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse"></div>
+                          <span className="text-sm font-medium">Stock moyen</span>
+                        </div>
+                      ) : selectedVariant.stock > 0 ? (
+                        <div className="flex items-center space-x-2 text-orange-400">
+                          <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
+                          <span className="text-sm font-medium">Stock faible</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2 text-red-400">
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          <span className="text-sm font-medium">Rupture de stock</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
