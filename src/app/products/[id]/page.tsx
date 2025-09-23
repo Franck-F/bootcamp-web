@@ -157,8 +157,18 @@ export default function ProductPage() {
       return usToEuChild[size]
     }
     
-    // Si aucune correspondance, retourner la taille originale
-    return size
+    // Si c'est une taille non-européenne (UK, JP, WM, etc.), ne pas l'afficher
+    if (size.includes('UK') || size.includes('US') || size.includes('JP') || 
+        size.includes('WM') || size.includes('CM') || size.includes('IN') ||
+        size.includes('Men') || size.includes('Women') || size.includes('Kids') ||
+        size.includes('UK') || size.includes('JP') || size.includes('WM') ||
+        size.includes('CM') || size.includes('IN') || size.includes('Men') ||
+        size.includes('Women') || size.includes('Kids')) {
+      return null // Ne pas afficher cette taille
+    }
+    
+    // Si aucune correspondance et que ce n'est pas une taille européenne, ne pas l'afficher
+    return null
   }
 
   const handleVariantChange = (variant: any) => {
@@ -190,7 +200,9 @@ export default function ProductPage() {
   const getAvailableSizes = () => {
     if (!product?.variants) return []
     const sizes = Array.from(new Set(product.variants.map(v => v.size).filter((size): size is string => Boolean(size))))
-    return sizes.sort()
+    // Filtrer les tailles pour ne garder que celles qui peuvent être formatées en EU
+    const euSizes = sizes.filter(size => formatSize(size) !== null)
+    return euSizes.sort()
   }
 
   const getAvailableColors = () => {
