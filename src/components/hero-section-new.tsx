@@ -115,7 +115,7 @@ export function HeroSectionNew() {
             <div className="relative">
               <div className="relative h-[800px] w-full">
                 <Image
-                src="/fashion-shoes-sneakers.png" // ← Ton image perso ici
+                src="/imageneak.png" // ← Ton image perso ici
                 alt="Mon produit personnalisé"
                 fill
                 className="object-contain transform rotate-12 hover:rotate-6 transition-transform duration-500"

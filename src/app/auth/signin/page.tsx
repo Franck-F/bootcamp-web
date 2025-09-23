@@ -60,14 +60,16 @@ export default function SignInPage() {
           {/* Logo and Title */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-r from-red-600 to-pink-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-black text-xl">S</span>
-              </div>
-              <span className="text-2xl font-black text-white">SneakPeak</span>
+              <div className="logo-container w-9 h-9 ">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+              
             </Link>
-            <h1 className="text-3xl font-black text-white mb-2">
-              SneakPeak
-            </h1>
+            
             <p className="text-gray-400 text-lg">
               Votre destination premium pour les sneakers.
             </p>
@@ -200,7 +202,7 @@ export default function SignInPage() {
         {/* Sneaker Image */}
         <div className="absolute inset-0 z-10">
           <Image
-            src="/fashion-shoes-sneakers.png"
+            src="/imageneak.png"
             alt="Sneakers Premium"
             fill
             className="object-cover"
