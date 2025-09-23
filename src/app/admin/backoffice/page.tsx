@@ -75,21 +75,15 @@ export default function BackofficePage() {
 
   // Fonctions pour les actions
   const handleImportCSV = () => {
-    if (typeof window !== 'undefined') {
-      alert('Fonctionnalité d\'import CSV en cours de développement')
-    }
+    router.push('/admin/products')
   }
 
   const handleExport = () => {
-    if (typeof window !== 'undefined') {
-      alert('Fonctionnalité d\'export en cours de développement')
-    }
+    router.push('/admin/products')
   }
 
   const handleNewProduct = () => {
-    if (typeof window !== 'undefined') {
-      alert('Fonctionnalité d\'ajout de produit en cours de développement')
-    }
+    router.push('/admin/products/new')
   }
 
   const handleRefreshStock = () => {
