@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+export const runtime = 'nodejs'
+
 // GET pour récupérer les paramètres de stock
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)

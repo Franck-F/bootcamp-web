@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { productSchema } from '@/lib/validations'
 import { sanitizeInput } from '@/lib/utils'
 
+export const runtime = 'nodejs'
+
 // GET - Récupérer tous les produits
 export async function GET(request: NextRequest) {
   try {

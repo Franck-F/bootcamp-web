@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
+export const runtime = 'nodejs'
+
 // GET - Récupérer tous les utilisateurs
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
