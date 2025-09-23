@@ -109,8 +109,8 @@ export default function CheckoutPage() {
         // Vider le panier
         clearCart()
         
-        // Rediriger vers la page de confirmation
-        router.push(`/orders/${result.order.id}`)
+        // Rediriger vers la page de succès avec téléchargement du reçu
+        router.push(`/checkout/success?orderId=${result.order.id}&orderNumber=${result.order.order_number}`)
       } else {
         const error = await orderResponse.json()
         toast.error(error.error || 'Erreur lors de la création de la commande')

@@ -23,6 +23,7 @@ import {
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
+import { ReceiptDownload } from '@/components/receipt-download'
 
 interface OrderItem {
   id: number
@@ -316,14 +317,11 @@ export default function OrderConfirmationPage({ params }: { params: { id: string
                 </div>
 
                 <div className="mt-6 space-y-3">
-                  <Button 
-                    onClick={handleDownloadInvoice}
-                    variant="outline" 
+                  <ReceiptDownload 
+                    orderId={order.id} 
+                    orderNumber={order.orderNumber}
                     className="w-full"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Télécharger la facture
-                  </Button>
+                  />
                   
                   <Button 
                     onClick={() => router.push('/orders')}
