@@ -152,6 +152,77 @@ La protection des routes et des endpoints de l'API est assurée en vérifiant le
 
 Le répertoire `scripts/` contient plusieurs scripts Node.js pour diverses tâches de maintenance, de test et de débogage.
 
+## 9. Installation et Démarrage
+
+### Prérequis
+- Node.js 18+
+- npm ou yarn
+- Compte Railway (pour la base de données)
+
+### 1. Cloner le repository
+```bash
+git clone https://github.com/Franck-F/bootcamp-web.git
+cd bootcamp-web
+```
+
+### 2. Installer les dépendances
+```bash
+npm install
+```
+
+### 3. Configuration de la base de données
+1. Créer un projet sur [Railway](https://railway.app)
+2. Ajouter une base de données PostgreSQL
+3. Copier les variables de connexion
+
+### 4. Variables d'environnement
+Créer un fichier `.env.local` :
+```env
+# Base de données
+DATABASE_URL="postgresql://username:password@host:port/database"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
+
+# Railway (optionnel)
+RAILWAY_STATIC_URL="your-railway-url"
+```
+
+### 5. Initialiser la base de données
+```bash
+# Générer le client Prisma
+npx prisma generate
+
+# Appliquer les migrations
+npx prisma db push
+
+# Peupler la base de données (optionnel)
+npx prisma db seed
+```
+
+### 6. Démarrer le serveur de développement
+```bash
+npm run dev
+```
+Le site sera accessible sur [http://localhost:3000](http://localhost:3000)
+
+## 10. Déploiement sur Vercel
+
+### 1. Connecter le repository
+1. Aller sur [Vercel](https://vercel.com)
+2. Importer le projet depuis GitHub
+3. Sélectionner le repository `bootcamp-web`
+
+### 2. Configuration des variables d'environnement
+Dans Vercel, ajouter les variables :
+- `DATABASE_URL`
+- `NEXTAUTH_URL`
+- `NEXTAUTH_SECRET`
+
+### 3. Déploiement automatique
+Vercel déploiera automatiquement à chaque push sur la branche `main`.
+
 | Script                        | Description                                                                          |
 | ----------------------------- | ------------------------------------------------------------------------------------ |
 | `check-admin-users.js`        | Vérifie et liste les utilisateurs avec le rôle d'administrateur.                     |
