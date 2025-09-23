@@ -18,9 +18,17 @@ import {
   RotateCcw,
   Plus,
   Minus,
-  Check
+  Check,
+  Heart,
+  Share2,
+  ZoomIn,
+  Crown,
+  Sparkles,
+  Award,
+  TrendingUp
 } from 'lucide-react'
 import { WishlistButton } from '@/components/wishlist-button'
+import { useCart } from '@/store/cart-context'
 
 interface Product {
   id: number
@@ -60,151 +68,127 @@ interface Product {
   }>
 }
 
-export default function ProductDetailsPage() {
+export default function ProductPage() {
   const params = useParams()
   const router = useRouter()
-  const productId = params.id as string
-
+  const { addItem } = useCart()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedVariant, setSelectedVariant] = useState<any>(null)
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [quantity, setQuantity] = useState(1)
-  const [addingToCart, setAddingToCart] = useState(false)
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [selectedImage, setSelectedImage] = useState(0)
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch(`/api/products/${productId}`)
-        
-        if (!response.ok) {
-          throw new Error('Produit non trouvé')
-        }
-        
+    if (params.id) {
+      fetchProduct()
+    }
+  }, [params.id])
+
+  const fetchProduct = async () => {
+    try {
+      const response = await fetch(`/api/products/${params.id}`)
+      if (response.ok) {
         const data = await response.json()
         setProduct(data)
-        
-        // Sélectionner la première variante par défaut
         if (data.variants && data.variants.length > 0) {
           setSelectedVariant(data.variants[0])
           setSelectedSize(data.variants[0].size || '')
           setSelectedColor(data.variants[0].color || '')
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur lors du chargement')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (productId) {
-      fetchProduct()
-    }
-  }, [productId])
-
-  const addToCart = async () => {
-    if (!product || !selectedVariant) return
-
-    setAddingToCart(true)
-    try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          variantId: selectedVariant.id,
-          quantity: quantity
-        }),
-      })
-
-      if (response.ok) {
-        // Optionnel: Afficher une notification de succès
-        console.log('Produit ajouté au panier')
       } else {
-        console.error('Erreur lors de l\'ajout au panier')
+        router.push('/products')
       }
     } catch (error) {
-      console.error('Erreur:', error)
+      console.error('Erreur lors du chargement du produit:', error)
+      router.push('/products')
     } finally {
-      setAddingToCart(false)
+      setLoading(false)
     }
   }
 
+  const formatSize = (size: string) => {
+    if (!size) return ''
+    
+    // Si c'est déjà une taille EU, la retourner
+    if (size.includes('EU') || size.includes('FR')) {
+      return size
+    }
+    
+    // Conversion US vers EU pour adultes
+    const usToEuAdult: { [key: string]: string } = {
+      '6': 'EU 39', '6.5': 'EU 39.5', '7': 'EU 40', '7.5': 'EU 40.5',
+      '8': 'EU 41', '8.5': 'EU 42', '9': 'EU 42.5', '9.5': 'EU 43',
+      '10': 'EU 44', '10.5': 'EU 44.5', '11': 'EU 45', '11.5': 'EU 45.5',
+      '12': 'EU 46', '12.5': 'EU 47', '13': 'EU 47.5', '14': 'EU 48.5'
+    }
+    
+    // Conversion US vers EU pour enfants
+    const usToEuChild: { [key: string]: string } = {
+      '1': 'EU 32', '1.5': 'EU 33', '2': 'EU 33.5', '2.5': 'EU 34',
+      '3': 'EU 35', '3.5': 'EU 35.5', '4': 'EU 36', '4.5': 'EU 37',
+      '5': 'EU 37.5', '5.5': 'EU 38'
+    }
+    
+    // Essayer d'abord la conversion adulte
+    if (usToEuAdult[size]) {
+      return usToEuAdult[size]
+    }
+    
+    // Puis la conversion enfant
+    if (usToEuChild[size]) {
+      return usToEuChild[size]
+    }
+    
+    // Si aucune correspondance, retourner la taille originale
+    return size
+  }
 
-  const selectVariant = (variant: any) => {
+  const handleVariantChange = (variant: any) => {
     setSelectedVariant(variant)
     setSelectedSize(variant.size || '')
     setSelectedColor(variant.color || '')
-    
-    // Changer l'image principale basé sur la couleur ou utiliser un index aléatoire
-    if (product && product.product_images.length > 1) {
-      const colorIndex = colors.indexOf(variant.color || '')
-      if (colorIndex >= 0 && colorIndex < product.product_images.length) {
-        setSelectedImageIndex(colorIndex)
-      } else {
-        // Si pas de correspondance de couleur, utiliser un index basé sur l'ID du variant
-        const imageIndex = variant.id % product.product_images.length
-        setSelectedImageIndex(imageIndex)
-      }
-    }
   }
 
-  const selectImage = (index: number) => {
-    setSelectedImageIndex(index)
-  }
-
-  const formatSize = (sizeString: string) => {
-    if (!sizeString) return 'Unique'
-    
-    // Extraire la taille EU (normes européennes) - priorité absolue
-    const euMatch = sizeString.match(/EU (\d+(?:\.\d+)?)/)
-    if (euMatch) {
-      return `EU ${euMatch[1]}`
-    }
-    
-    // Si pas de EU, essayer de convertir depuis US
-    const usMatch = sizeString.match(/US (\d+(?:\.\d+)?)/)
-    if (usMatch) {
-      const usSize = parseFloat(usMatch[1])
-      
-      // Pour les enfants
-      if (product?.categories?.name === 'Infant/Toddler Shoes' || product?.categories?.name?.toLowerCase().includes('enfant')) {
-        const euSize = Math.round(usSize + 18)
-        if (euSize >= 18 && euSize <= 35) {
-          return `EU ${euSize}`
+  const handleAddToCart = () => {
+    if (selectedVariant && product) {
+      addItem({
+        productId: product.id.toString(),
+        size: selectedVariant.size || '',
+        quantity: quantity,
+        addedAt: new Date().toISOString(),
+        product: {
+          id: product.id.toString(),
+          name: product.name,
+          brand: product.brands.name,
+          price: selectedVariant.price,
+          images: product.product_images.map(img => img.image_url),
+          availableStock: selectedVariant.stock,
+          category: product.categories.name
         }
-      }
-      
-      // Pour les adultes - conversion approximative US vers EU
-      if (usSize >= 3 && usSize <= 15) {
-        const euSize = Math.round(usSize + 33)
-        if (euSize >= 36 && euSize <= 48) {
-          return `EU ${euSize}`
-        }
-      }
-      
-      return `US ${usSize}`
+      })
     }
-    
-    // Si rien ne correspond, retourner les 10 premiers caractères
-    return sizeString.length > 10 ? sizeString.substring(0, 10) + '...' : sizeString
   }
 
-  const getUniqueSizes = () => {
-    if (!product) return []
-    const uniqueSizes = Array.from(new Set(product.variants.map(v => v.size).filter(Boolean)))
-    return uniqueSizes.sort((a, b) => {
-      // Trier par taille numérique si possible
-      const aNum = parseFloat((a || '').match(/\d+(?:\.\d+)?/)?.[0] || '0')
-      const bNum = parseFloat((b || '').match(/\d+(?:\.\d+)?/)?.[0] || '0')
-      return aNum - bNum
-    })
+  const getAvailableSizes = () => {
+    if (!product?.variants) return []
+    const sizes = Array.from(new Set(product.variants.map(v => v.size).filter((size): size is string => Boolean(size))))
+    return sizes.sort()
+  }
+
+  const getAvailableColors = () => {
+    if (!product?.variants) return []
+    const colors = Array.from(new Set(product.variants.map(v => v.color).filter((color): color is string => Boolean(color))))
+    return colors
+  }
+
+  const getVariantsBySize = (size: string) => {
+    return product?.variants.filter(v => v.size === size) || []
+  }
+
+  const getVariantsByColor = (color: string) => {
+    return product?.variants.filter(v => v.color === color) || []
   }
 
   if (loading) {
@@ -213,7 +197,7 @@ export default function ProductDetailsPage() {
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-white text-xl">Chargement du produit...</p>
           </div>
         </div>
@@ -222,18 +206,22 @@ export default function ProductDetailsPage() {
     )
   }
 
-  if (error || !product) {
+  if (!product) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">Produit non trouvé</h1>
-            <p className="text-gray-400 mb-8">{error}</p>
-            <Button onClick={() => router.back()} className="bg-red-600 hover:bg-red-700">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
-            </Button>
+            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShoppingCart className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">Produit non trouvé</h3>
+            <p className="text-gray-400 mb-6">Le produit que vous recherchez n'existe pas.</p>
+            <Link href="/products">
+              <Button className="bg-orange-600 hover:bg-orange-700">
+                Retour aux produits
+              </Button>
+            </Link>
           </div>
         </div>
         <Footer />
@@ -241,197 +229,193 @@ export default function ProductDetailsPage() {
     )
   }
 
-  const sizes = getUniqueSizes()
-  const colors = product ? Array.from(new Set(product.variants.map(v => v.color).filter(Boolean))) : []
+  const discountPercentage = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0
 
   return (
     <div className="min-h-screen bg-black">
       <Navigation />
       
-      <main className="w-full px-4 sm:px-6 lg:px-8 py-12">
-        {/* Breadcrumb */}
-        <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()}
-            className="text-gray-400 hover:text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Images */}
-          <div className="space-y-6">
-            <div className="relative h-96 lg:h-[500px] bg-white rounded-2xl overflow-hidden">
-              {product.product_images && product.product_images.length > 0 ? (
-                <Image
-                  src={product.product_images[selectedImageIndex].image_url}
-                  alt={product.product_images[selectedImageIndex].alt_text || product.name}
-                  fill
-                  className="object-contain p-8 transition-all duration-300"
-                  priority
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 bg-gray-100">
-                  Image non disponible
-                </div>
+      {/* Header avec design cohérent */}
+      <div className="bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-2">
+                <Link href="/products" className="text-gray-400 hover:text-white transition-colors">
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <span className="text-gray-600">/</span>
+                <Link href="/products" className="text-gray-400 hover:text-white transition-colors">
+                  Produits
+                </Link>
+                <span className="text-gray-600">/</span>
+                <Link href={`/products?category=${product.categories.name}`} className="text-gray-400 hover:text-white transition-colors">
+                  {product.categories.name}
+                </Link>
+              </div>
+              <h1 className="text-4xl font-black text-white mb-2 flex items-center">
+                <Crown className="w-8 h-8 mr-3 text-orange-500" />
+                {product.name}
+              </h1>
+              <p className="text-gray-400 text-lg">
+                {product.brands.name} • {product.categories.name}
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {product.featured && (
+                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+                  <Crown className="w-3 h-3 mr-1" />
+                  Featured
+                </Badge>
+              )}
+              {product.isNew && (
+                <Badge className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Nouveau
+                </Badge>
+              )}
+              {product.onSale && (
+                <Badge className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  -{discountPercentage}%
+                </Badge>
               )}
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Thumbnail Images */}
-            {product.product_images && product.product_images.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {product.product_images.slice(0, 4).map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => selectImage(index)}
-                    className={`relative h-20 bg-white rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                      selectedImageIndex === index 
-                        ? 'border-red-500 ring-2 ring-red-500/20' 
-                        : 'border-gray-200 hover:border-gray-400'
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Galerie d'images */}
+          <div className="space-y-4">
+            {/* Image principale */}
+            <div className="relative group">
+              <div className="aspect-square bg-white rounded-2xl overflow-hidden">
+                <Image
+                  src={product.product_images[selectedImage]?.image_url || '/placeholder-sneaker.jpg'}
+                  alt={product.name}
+                  width={600}
+                  height={600}
+                  className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder-sneaker.jpg'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Miniatures */}
+            {product.product_images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {product.product_images.map((image, index) => (
+                  <div
+                    key={image.id}
+                    className={`aspect-square bg-white rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                      selectedImage === index 
+                        ? 'border-orange-500 ring-2 ring-orange-500/20' 
+                        : 'border-gray-700 hover:border-gray-500'
                     }`}
-                    title={`Voir l'image ${index + 1}`}
+                    onClick={() => setSelectedImage(index)}
                   >
                     <Image
                       src={image.image_url}
                       alt={image.alt_text || product.name}
-                      fill
-                      className="object-contain p-2"
+                      width={150}
+                      height={150}
+                      className="w-full h-full object-contain p-2"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-sneaker.jpg'
+                      }}
                     />
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-8">
-            {/* Header */}
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <Badge className="bg-gray-700 text-gray-300">
-                  {product.brands.name}
-                </Badge>
-                {product.isNew && (
-                  <Badge className="bg-blue-600 text-white">
-                    Nouveau
-                  </Badge>
-                )}
-                {product.onSale && (
-                  <Badge className="bg-red-600 text-white">
-                    En solde
-                  </Badge>
-                )}
-              </div>
-
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                {product.name}
-              </h1>
-
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                  <span className="text-white font-medium">{product.averageRating}</span>
-                  <span className="text-gray-400">({product.totalReviews} avis)</span>
-                </div>
-                <Badge className="bg-gray-700 text-gray-300">
-                  {product.categories.name}
-                </Badge>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <span className="text-4xl font-bold text-white">
-                  {product.price}€
-                </span>
-                {product.originalPrice && (
-                  <span className="text-2xl text-gray-400 line-through">
-                    {product.originalPrice}€
-                  </span>
-                )}
-                {product.originalPrice && (
-                  <Badge className="bg-red-600 text-white">
-                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                  </Badge>
-                )}
-              </div>
-            </div>
-
+          {/* Informations produit */}
+          <div className="space-y-6">
             {/* Description */}
             {product.description && (
               <div>
-                <h3 className="text-xl font-semibold text-white mb-3">Description</h3>
+                <h3 className="text-white font-semibold mb-3">Description</h3>
                 <p className="text-gray-300 leading-relaxed">
                   {product.description}
                 </p>
               </div>
             )}
 
-            {/* Variants */}
-            <div className="space-y-6">
-              {/* Colors */}
-              {colors.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Couleur</h3>
-                  <div className="flex space-x-3">
-                    {colors.map((color) => {
-                      const variant = product.variants.find(v => v.color === color)
-                      return (
-                        <button
-                          key={color}
-                          onClick={() => variant && selectVariant(variant)}
-                          disabled={!variant || variant.stock === 0}
-                          className={`w-12 h-12 rounded-full border-2 transition-all duration-200 ${
-                            selectedColor === color 
-                              ? 'border-white ring-2 ring-white/50' 
-                              : variant && variant.stock > 0
-                              ? 'border-gray-600 hover:border-gray-400 hover:scale-110'
-                              : 'border-gray-700 opacity-50 cursor-not-allowed'
-                          }`}
-                          style={{ backgroundColor: color }}
-                          title={`${color}${variant && variant.stock === 0 ? ' (Rupture)' : ''}`}
-                        />
-                      )
-                    })}
-                  </div>
+            {/* Prix et évaluation */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-3xl font-bold text-white">
+                    {product.price.toFixed(2)} €
+                  </span>
+                  {product.originalPrice && (
+                    <span className="text-xl text-gray-400 line-through">
+                      {product.originalPrice.toFixed(2)} €
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(product.averageRating)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-gray-400 text-sm">
+                  ({product.totalReviews} avis)
+                </span>
+              </div>
+            </div>
 
-              {/* Sizes */}
-              {sizes.length > 0 && (
+            {/* Sélection des variantes */}
+            <div className="space-y-6">
+              {/* Tailles */}
+              {getAvailableSizes().length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Taille</h3>
-                  <div className="grid grid-cols-8 gap-2">
-                    {sizes.map((size) => {
-                      const variant = product.variants.find(v => v.size === size)
+                  <h3 className="text-white font-semibold mb-3">Taille</h3>
+                  <div className="grid grid-cols-4 gap-2">
+                    {getAvailableSizes().map((size) => {
+                      const variants = getVariantsBySize(size)
+                      const isAvailable = variants.some(v => v.stock > 0)
                       const isSelected = selectedSize === size
-                      const isAvailable = variant && variant.stock > 0
                       
                       return (
                         <button
                           key={size}
-                          onClick={() => variant && selectVariant(variant)}
+                          onClick={() => {
+                            if (isAvailable) {
+                              const variant = variants.find(v => v.stock > 0)
+                              if (variant) {
+                                handleVariantChange(variant)
+                              }
+                            }
+                          }}
                           disabled={!isAvailable}
-                          className={`relative py-3 px-2 rounded-lg border-2 text-center font-medium transition-all duration-200 ${
+                          className={`p-3 rounded-lg border-2 text-center font-medium transition-all ${
                             isSelected
-                              ? 'border-red-500 bg-red-500/10 text-red-400 shadow-lg shadow-red-500/20'
+                              ? 'border-orange-500 bg-orange-500/10 text-orange-500'
                               : isAvailable
-                              ? 'border-gray-600 text-gray-300 hover:border-gray-400 hover:bg-gray-800/50 hover:scale-105'
-                              : 'border-gray-700 text-gray-500 bg-gray-800/30 cursor-not-allowed opacity-50'
+                              ? 'border-gray-600 text-white hover:border-gray-500 hover:bg-gray-800'
+                              : 'border-gray-700 text-gray-500 cursor-not-allowed'
                           }`}
-                          title={isAvailable ? `${size} - En stock` : `${size} - Rupture de stock`}
                         >
-                          <div className="text-sm font-semibold">
-                            {formatSize(size || '')}
-                          </div>
-                          {!isAvailable && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-4 h-4 border border-gray-500 rounded-full flex items-center justify-center">
-                                <div className="w-2 h-0.5 bg-gray-500"></div>
-                              </div>
-                            </div>
-                          )}
+                          {formatSize(size)}
                         </button>
                       )
                     })}
@@ -439,29 +423,73 @@ export default function ProductDetailsPage() {
                 </div>
               )}
 
-              {/* Quantity */}
+              {/* Couleurs */}
+              {getAvailableColors().length > 0 && (
+                <div>
+                  <h3 className="text-white font-semibold mb-3">Couleur</h3>
+                  <div className="flex space-x-3">
+                    {getAvailableColors().map((color) => {
+                      const variants = getVariantsByColor(color)
+                      const isAvailable = variants.some(v => v.stock > 0)
+                      const isSelected = selectedColor === color
+                      
+                      return (
+                        <button
+                          key={color}
+                          onClick={() => {
+                            if (isAvailable) {
+                              const variant = variants.find(v => v.stock > 0)
+                              if (variant) {
+                                handleVariantChange(variant)
+                              }
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${
+                            isSelected
+                              ? 'border-orange-500 bg-orange-500/10 text-orange-500'
+                              : isAvailable
+                              ? 'border-gray-600 text-white hover:border-gray-500 hover:bg-gray-800'
+                              : 'border-gray-700 text-gray-500 cursor-not-allowed'
+                          }`}
+                        >
+                          {color}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantité */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">Quantité</h3>
+                <h3 className="text-white font-semibold mb-3">Quantité</h3>
                 <div className="flex items-center space-x-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="border-gray-600 text-white hover:bg-gray-800"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="text-xl font-semibold text-white w-12 text-center">
-                    {quantity}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="border-gray-600 text-white hover:bg-gray-800"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
+                  <div className="flex items-center border border-gray-600 rounded-lg">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="text-white hover:bg-gray-800"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
+                    <span className="px-4 py-2 text-white font-medium">{quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setQuantity(Math.min(selectedVariant?.stock || 1, quantity + 1))}
+                      className="text-white hover:bg-gray-800"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  {selectedVariant && (
+                    <span className="text-gray-400 text-sm">
+                      {selectedVariant.stock} en stock
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -470,44 +498,55 @@ export default function ProductDetailsPage() {
             <div className="space-y-4">
               <div className="flex space-x-4">
                 <Button
-                  onClick={addToCart}
-                  disabled={addingToCart || !selectedVariant}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-bold py-4 text-lg rounded-xl"
+                  onClick={handleAddToCart}
+                  disabled={!selectedVariant || selectedVariant.stock === 0}
+                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-4 text-lg font-semibold"
                 >
-                  {addingToCart ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  ) : (
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                  )}
-                  {addingToCart ? 'Ajout...' : 'Ajouter au panier'}
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Ajouter au panier
                 </Button>
+                
                 <WishlistButton 
                   productId={product.id}
-                  size="icon"
-                  variant="outline"
-                  className="border-2 border-gray-600 text-gray-300 hover:border-gray-400 dark:border-gray-400 dark:text-gray-300 dark:hover:border-gray-300"
+                  className="px-6 py-4 border border-gray-600 text-white hover:bg-gray-800"
                 />
               </div>
 
-              {/* Features */}
-              <div className="grid grid-cols-3 gap-4 pt-6">
-                <div className="text-center">
-                  <Truck className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Livraison gratuite</p>
-                </div>
-                <div className="text-center">
-                  <Shield className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Garantie 2 ans</p>
-                </div>
-                <div className="text-center">
-                  <RotateCcw className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Retour 30 jours</p>
-                </div>
-              </div>
+              <Button
+                variant="outline"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 py-3"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Partager
+              </Button>
             </div>
+
+            {/* Informations de livraison */}
+            <Card className="bg-gray-900 border-gray-800">
+              <CardContent className="p-6">
+                <h3 className="text-white font-semibold mb-4 flex items-center">
+                  <Truck className="w-5 h-5 mr-2 text-orange-500" />
+                  Livraison & Retours
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center text-gray-300">
+                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                    Livraison gratuite à partir de 50€
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                    Retours gratuits sous 30 jours
+                  </div>
+                  <div className="flex items-center text-gray-300">
+                    <Check className="w-4 h-4 mr-2 text-green-500" />
+                    Garantie 2 ans
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </main>
+      </div>
 
       <Footer />
     </div>
