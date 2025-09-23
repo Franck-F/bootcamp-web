@@ -77,8 +77,8 @@ export function generateCSRFToken(): string {
 }
 
 // Validation des tokens CSRF
-export function validateCSRFToken(token: string, sessionToken: string): boolean {
-  return token === sessionToken && token.length === 64
+export function validateCSRFToken(token: string, userToken: string): boolean {
+  return token === userToken && token.length === 64
 }
 
 // Chiffrement des données sensibles

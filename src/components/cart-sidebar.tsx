@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
@@ -56,7 +56,7 @@ export function CartSidebar() {
     getTotalPrice,
     getTotalItems 
   } = useCart()
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [mounted, setMounted] = useState(false)
@@ -104,7 +104,7 @@ export function CartSidebar() {
   }
 
   const handleCheckout = () => {
-    if (!session) {
+    if (!user) {
       router.push('/auth/signin')
       return
     }

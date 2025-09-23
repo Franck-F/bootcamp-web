@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
                     <li>• Adresse IP</li>
                     <li>• Type de navigateur</li>
                     <li>• Pages visitées</li>
-                    <li>• Durée de session</li>
+                    <li>• Durée de user</li>
                     <li>• Cookies et technologies similaires</li>
                   </ul>
                 </div>

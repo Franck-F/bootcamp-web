@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -62,9 +62,9 @@ interface StockStats {
 }
 
 export default function BackofficePage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -123,22 +123,23 @@ export default function BackofficePage() {
   useEffect(() => {
     if (!mounted) return
 
-    if (status === 'unauthenticated') {
+    if (loading) return
+
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user) {
-      if (session.user.role !== 'admin') {
-        router.push('/')
-        return
-      }
-      loadStockData()
+    if (user?.role !== 'admin') {
+      router.push('/')
+      return
     }
-  }, [session, status, router, mounted])
+    
+    loadStockData()
+  }, [user, loading, router, mounted])
 
   const loadStockData = async () => {
-    setLoading(true)
+    setPageLoading(true)
     try {
       const response = await fetch('/api/stock')
       if (response.ok) {
@@ -234,7 +235,7 @@ export default function BackofficePage() {
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error)
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 

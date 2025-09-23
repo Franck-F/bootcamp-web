@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -18,32 +18,22 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { signIn } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
+      const result = await signIn(email, password)
 
-      if (result?.error) {
-        toast.error('Email ou mot de passe incorrect')
+      if (!result.success) {
+        toast.error(result.error || 'Email ou mot de passe incorrect')
       } else {
         toast.success('Connexion réussie !')
-        const session = await getSession()
         
-        // Redirection selon le rôle
-        if (session?.user?.role === 'admin') {
-          router.push('/admin/backoffice')
-        } else if (session?.user?.role === 'moderator') {
-          router.push('/admin/backoffice')
-        } else {
-          router.push('/')
-        }
+        // Redirection selon le rôle - l'utilisateur sera disponible via le hook
+        router.push('/')
       }
     } catch (error) {
       toast.error('Une erreur est survenue')

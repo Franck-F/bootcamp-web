@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -53,10 +53,10 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedBrand, setSelectedBrand] = useState('')
@@ -65,18 +65,18 @@ export default function AdminProductsPage() {
   const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
 
     fetchProducts()
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const fetchProducts = async () => {
     try {
@@ -89,7 +89,7 @@ export default function AdminProductsPage() {
       console.error('Erreur lors du chargement des produits:', error)
       toast.error('Erreur lors du chargement des produits')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 
@@ -166,7 +166,7 @@ export default function AdminProductsPage() {
     return matchesSearch && matchesCategory && matchesBrand
   })
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />

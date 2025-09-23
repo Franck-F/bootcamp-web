@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -50,9 +50,9 @@ interface NotificationSettings {
 }
 
 export default function AdminSettingsPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('general')
   
@@ -81,19 +81,19 @@ export default function AdminSettingsPage() {
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user) {
-      if (session.user.role !== 'admin') {
+    if (user) {
+      if (user?.role !== 'admin') {
         router.push('/')
         return
       }
-      setLoading(false)
+      setPageLoading(false)
     }
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const handleSaveSettings = async () => {
     setSaving(true)
@@ -111,7 +111,7 @@ export default function AdminSettingsPage() {
     }
   }
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />

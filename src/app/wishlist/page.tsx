@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -23,7 +23,7 @@ import { formatPrice } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
 
 export default function WishlistPage() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
   const { items, isLoading, error, removeFromWishlist, clearWishlist } = useWishlist()
   const { addItem } = useCart()
@@ -32,10 +32,10 @@ export default function WishlistPage() {
 
   // Rediriger si non connecté
   useEffect(() => {
-    if (!session?.user) {
+    if (!user) {
       router.push('/auth/signin')
     }
-  }, [session, router])
+  }, [user, router])
 
   const handleAddToCart = async (product: any) => {
     setAddingToCart(product.id)
@@ -95,7 +95,7 @@ export default function WishlistPage() {
     return getAvailableSizes(product).length > 0
   }
 
-  if (!session?.user) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center max-w-[90%] mx-auto">

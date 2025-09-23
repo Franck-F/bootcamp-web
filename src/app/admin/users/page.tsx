@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -61,11 +61,11 @@ interface UserStats {
 }
 
 export default function AdminUsersPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [stats, setStats] = useState<UserStats | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -76,18 +76,18 @@ export default function AdminUsersPage() {
   const [showBulkActions, setShowBulkActions] = useState(false)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
 
     fetchUsers()
-  }, [session, status, router, currentPage, searchTerm, roleFilter, statusFilter])
+  }, [user, loading, router, currentPage, searchTerm, roleFilter, statusFilter])
 
   const fetchUsers = async () => {
     try {
@@ -110,7 +110,7 @@ export default function AdminUsersPage() {
       console.error('Erreur lors du chargement des utilisateurs:', error)
       toast.error('Erreur lors du chargement des utilisateurs')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 
@@ -162,7 +162,7 @@ export default function AdminUsersPage() {
     if (selectedUsers.length === users.length) {
       setSelectedUsers([])
     } else {
-      setSelectedUsers(users.map(user => user.id))
+      setSelectedUsers(users.map(user => user?.id))
     }
   }
 
@@ -188,7 +188,7 @@ export default function AdminUsersPage() {
     }
   }
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />
@@ -402,20 +402,20 @@ export default function AdminUsersPage() {
             <div className="space-y-4">
               {users.map((user) => (
                 <div
-                  key={user.id}
+                  key={user?.id}
                   className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
                 >
                   <div className="flex items-center space-x-4">
                     <input
                       type="checkbox"
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={() => handleUserSelect(user.id)}
+                      checked={selectedUsers.includes(user?.id)}
+                      onChange={() => handleUserSelect(user?.id)}
                       className="w-4 h-4 text-orange-600 bg-gray-800 border-gray-700 rounded focus:ring-orange-500"
                     />
                     
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-white font-semibold">{user.name}</h3>
+                        <h3 className="text-white font-semibold">{user?.name}</h3>
                         <Badge className={`${getRoleColor(user.role)} text-xs flex items-center space-x-1`}>
                           {getRoleIcon(user.role)}
                           <span>{user.role}</span>
@@ -425,14 +425,14 @@ export default function AdminUsersPage() {
                         ) : (
                           <Badge className="bg-red-600 text-white text-xs">Inactif</Badge>
                         )}
-                        {user.email_verified ? (
+                        {user?.email_verified ? (
                           <Badge className="bg-blue-600 text-white text-xs">Vérifié</Badge>
                         ) : (
                           <Badge className="bg-yellow-600 text-white text-xs">Non vérifié</Badge>
                         )}
                       </div>
                       <div className="flex items-center space-x-4 text-sm text-gray-400">
-                        <span>{user.email}</span>
+                        <span>{user?.email}</span>
                         <span>•</span>
                         <span>{user._count.orders} commandes</span>
                         <span>•</span>
@@ -447,7 +447,7 @@ export default function AdminUsersPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => router.push(`/admin/users/${user.id}`)}
+                      onClick={() => router.push(`/admin/users/${user?.id}`)}
                       className="text-gray-400 hover:text-white"
                     >
                       <Eye className="w-4 h-4" />
@@ -455,7 +455,7 @@ export default function AdminUsersPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => router.push(`/admin/users/${user.id}/edit`)}
+                      onClick={() => router.push(`/admin/users/${user?.id}/edit`)}
                       className="text-gray-400 hover:text-white"
                     >
                       <Edit className="w-4 h-4" />

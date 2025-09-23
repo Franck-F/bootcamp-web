@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { AdminSidebar } from '@/components/admin/admin-sidebar'
@@ -10,20 +10,20 @@ import { RecentOrders } from '@/components/admin/recent-orders'
 import { LowStockAlert } from '@/components/admin/low-stock-alert'
 
 export default function AdminPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('dashboard')
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (loading) return
 
-    if (!session || !['admin', 'moderator'].includes(session.user.role)) {
+    if (!user || !['admin', 'moderator'].includes(user?.role)) {
       router.push('/')
       return
     }
-  }, [session, status, router])
+  }, [user, loading, router])
 
-  if (status === 'loading') {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -31,7 +31,7 @@ export default function AdminPage() {
     )
   }
 
-  if (!session || !['admin', 'moderator'].includes(session.user.role)) {
+  if (!user || !['admin', 'moderator'].includes(user?.role)) {
     return null
   }
 

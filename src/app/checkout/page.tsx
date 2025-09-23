@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Package } from 'lucide-react'
 import { Navigation } from '@/components/navigation'
@@ -31,7 +31,7 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const router = useRouter()
   const { state, getSubtotal, getTax, getShipping, getTotalPrice, clearCart } = useCart()
   const [currentStep, setCurrentStep] = useState(1)
@@ -39,7 +39,7 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
-    if (!session) {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
@@ -49,7 +49,7 @@ export default function CheckoutPage() {
       router.push('/products')
       return
     }
-  }, [session, router, state.items.length])
+  }, [user, router, state.items.length])
 
   const handleStepNext = (stepData: any) => {
     setFormData((prev: any) => ({ ...prev, ...stepData }))

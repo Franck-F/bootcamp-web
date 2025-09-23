@@ -1,70 +1,57 @@
-import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
-import { securityMiddleware } from './middleware/security'
+import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest, hasPermission } from '@/lib/edge-auth'
 
-export default withAuth(
-  function middleware(req) {
-    // Appliquer le middleware de sécurité en premier
-    const securityResponse = securityMiddleware(req)
-    if (securityResponse) {
-      return securityResponse
-    }
+export const runtime = 'experimental-edge'
 
-    const token = req.nextauth.token
-    const isAuth = !!token
-    const isAuthPage = req.nextUrl.pathname.startsWith('/auth')
-    const isAdminPage = req.nextUrl.pathname.startsWith('/admin')
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const user = await getUserFromRequest(request)
+  const isAuth = !!user
 
-    // Rediriger les utilisateurs authentifiés depuis les pages d'auth
-    if (isAuthPage && isAuth) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
+  // Pages publiques
+  const publicPaths = ['/', '/products', '/privacy-policy', '/terms', '/contact']
+  const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
 
-    // Protéger les pages admin
-    if (isAdminPage && !isAuth) {
-      return NextResponse.redirect(new URL('/auth/signin', req.url))
-    }
+  // Pages d'authentification
+  const isAuthPage = pathname.startsWith('/auth')
+  
+  // Pages admin
+  const isAdminPage = pathname.startsWith('/admin')
 
-    // Vérifier les rôles pour les pages admin
-    if (isAdminPage && isAuth) {
-      const userRole = token?.role
-      if (userRole !== 'admin' && userRole !== 'moderator') {
-        return NextResponse.redirect(new URL('/', req.url))
-      }
-    }
-
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Autoriser l'accès aux pages publiques
-        const publicPaths = ['/', '/products', '/privacy-policy', '/terms']
-        if (publicPaths.some(path => req.nextUrl.pathname.startsWith(path))) {
-          return true
-        }
-
-        // Autoriser l'accès aux pages d'auth
-        if (req.nextUrl.pathname.startsWith('/auth')) {
-          return true
-        }
-
-        // Vérifier l'authentification pour les autres pages
-        return !!token
-      },
-    },
+  // Rediriger les utilisateurs authentifiés depuis les pages d'auth
+  if (isAuthPage && isAuth) {
+    return NextResponse.redirect(new URL('/', request.url))
   }
-)
+
+  // Protéger les pages admin
+  if (isAdminPage && !isAuth) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
+  }
+
+  // Vérifier les rôles pour les pages admin
+  if (isAdminPage && isAuth) {
+    if (!hasPermission(user, 'moderator')) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
+  // Protéger les pages nécessitant une authentification
+  const protectedPaths = ['/profile', '/checkout', '/wishlist']
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
+  
+  if (isProtectedPath && !isAuth) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
     '/admin/:path*',
     '/auth/:path*',
-    '/checkout/:path*',
-    '/orders/:path*',
     '/profile/:path*',
-    '/api/payment/:path*',
-    '/api/orders/:path*',
-    '/api/cart/:path*'
+    '/checkout/:path*',
+    '/wishlist/:path*'
   ]
 }

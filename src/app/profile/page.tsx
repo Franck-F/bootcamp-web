@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -42,10 +42,10 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [editingPassword, setEditingPassword] = useState(false)
   const [showPasswords, setShowPasswords] = useState({
@@ -71,40 +71,40 @@ export default function ProfilePage() {
   const [passwordSuccess, setPasswordSuccess] = useState('')
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (loading) return
+
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user) {
-      // Simuler les données du profil (en production, récupérer depuis l'API)
-      setProfile({
-        id: session.user.id || '1',
-        name: session.user.name || 'Utilisateur',
-        email: session.user.email || '',
-        phone: '+33 6 12 34 56 78',
-        address: '123 Rue de la Mode',
-        city: 'Paris',
-        postalCode: '75001',
-        country: 'France',
-        role: session.user.role || 'customer',
-        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        lastLogin: new Date().toISOString()
-      })
+    // Simuler les données du profil (en production, récupérer depuis l'API)
+    setProfile({
+      id: user?.id || '1',
+      name: user?.name || 'Utilisateur',
+      email: user?.email || '',
+      phone: '+33 6 12 34 56 78',
+      address: '123 Rue de la Mode',
+      city: 'Paris',
+      postalCode: '75001',
+      country: 'France',
+      role: user?.role || 'customer',
+      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      lastLogin: new Date().toISOString()
+    })
 
-      setFormData({
-        name: session.user.name || '',
-        email: session.user.email || '',
-        phone: '+33 6 12 34 56 78',
-        address: '123 Rue de la Mode',
-        city: 'Paris',
-        postalCode: '75001',
-        country: 'France'
-      })
+    setFormData({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: '+33 6 12 34 56 78',
+      address: '123 Rue de la Mode',
+      city: 'Paris',
+      postalCode: '75001',
+      country: 'France'
+    })
 
-      setLoading(false)
-    }
-  }, [session, status, router])
+    setProfileLoading(false)
+  }, [user, loading, router])
 
   const handleSave = async () => {
     try {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useCart } from '@/store/cart-context'
 import { useWishlist } from '@/store/wishlist-context'
 import { Button } from '@/components/ui/button'
@@ -24,19 +24,19 @@ import { SearchBar } from '@/components/search-bar'
 import { usePathname } from 'next/navigation' // ✅ Import bien placé
 
 export function Navigation() {
-  const { data: session } = useSession()
+  const { user, signOut } = useAuth()
   const { getTotalItems, toggleCart } = useCart()
   const { getWishlistCount } = useWishlist()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname() // ✅ Hook bien placé
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: '/' })
+    signOut()
   }
 
-  const isAdmin = session?.user?.role === 'admin'
-  const isModerator = session?.user?.role === 'moderator'
-  const isCustomer = session?.user?.role === 'customer'
+  const isAdmin = user?.role === 'admin'
+  const isModerator = user?.role === 'moderator'
+  const isCustomer = user?.role === 'customer'
 
   return (
     <nav className="bg-black/50 backdrop-blur-lg border-b border-gray-800 shadow-xl sticky top-0 z-40">
@@ -160,11 +160,11 @@ export function Navigation() {
             </Button>
 
             {/* Menu utilisateur */}
-            {session ? (
+            {user ? (
               <div className="relative group">
                 <Button variant="ghost" className="flex items-center space-x-2">
                   <User className="w-5 h-5" />
-                  <span className="hidden lg:block">{session.user.name || session.user.email}</span>
+                  <span className="hidden lg:block">{user?.name || user?.email}</span>
                 </Button>
                 
                 {/* Dropdown menu */}
@@ -296,9 +296,9 @@ export function Navigation() {
                   )}
                 </Button>
 
-                {session ? (
+                {user ? (
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-300">{session.user.name || session.user.email}</span>
+                    <span className="text-sm text-gray-300">{user?.name || user?.email}</span>
                     <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-gray-300 hover:text-white">
                       Déconnexion
                     </Button>

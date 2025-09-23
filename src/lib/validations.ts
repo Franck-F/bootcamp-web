@@ -81,8 +81,7 @@ export const reviewSchema = z.object({
 
 // Validation RGPD
 export const cookieConsentSchema = z.object({
-  user_id: z.number().int().positive().optional(),
-  session_id: z.string().optional(),
+  user_id: z.union([z.number().int().positive(), z.string()]).optional(),
   consent: z.object({
     necessary: z.boolean().default(true),
     analytics: z.boolean().default(false),

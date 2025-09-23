@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 
 export interface WishlistItem {
   id: number
@@ -96,17 +96,17 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(wishlistReducer, initialState)
-  const { data: session } = useSession()
+  const { user } = useAuth()
 
   // Charger la wishlist au montage
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       loadWishlist()
     }
-  }, [session])
+  }, [user])
 
   const loadWishlist = async () => {
-    if (!session?.user) return
+    if (!user) return
 
     try {
       dispatch({ type: 'SET_LOADING', payload: true })
@@ -128,7 +128,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }
 
   const addToWishlist = async (productId: number): Promise<boolean> => {
-    if (!session?.user) {
+    if (!user) {
       dispatch({ type: 'SET_ERROR', payload: 'Vous devez être connecté pour ajouter à la wishlist' })
       return false
     }
@@ -164,7 +164,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }
 
   const removeFromWishlist = async (productId: number): Promise<boolean> => {
-    if (!session?.user) {
+    if (!user) {
       dispatch({ type: 'SET_ERROR', payload: 'Vous devez être connecté pour supprimer de la wishlist' })
       return false
     }
@@ -199,7 +199,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   }
 
   const clearWishlist = async (): Promise<void> => {
-    if (!session?.user) return
+    if (!user) return
 
     try {
       dispatch({ type: 'SET_LOADING', payload: true })

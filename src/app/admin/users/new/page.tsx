@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -26,9 +26,9 @@ import {
 import toast from 'react-hot-toast'
 
 export default function NewUserPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -46,16 +46,16 @@ export default function NewUserPage() {
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -105,7 +105,7 @@ export default function NewUserPage() {
       return
     }
 
-    setLoading(true)
+    setPageLoading(true)
     try {
       const response = await fetch('/api/admin/users', {
         method: 'POST',
@@ -139,7 +139,7 @@ export default function NewUserPage() {
       console.error('Erreur lors de la création:', error)
       toast.error('Erreur lors de la création de l\'utilisateur')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
 import { useWishlist } from '@/store/wishlist-context'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { toast } from 'react-hot-toast'
 
 interface WishlistButtonProps {
@@ -25,13 +25,13 @@ export function WishlistButton({
   disabled = false
 }: WishlistButtonProps) {
   const { isInWishlist, addToWishlist, removeFromWishlist, isLoading } = useWishlist()
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const [isToggling, setIsToggling] = useState(false)
 
   const isFavorite = isInWishlist(productId)
 
   const handleToggle = async () => {
-    if (!session?.user) {
+    if (!user) {
       toast.error('Vous devez être connecté pour utiliser la wishlist')
       return
     }

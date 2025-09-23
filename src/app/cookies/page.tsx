@@ -88,7 +88,7 @@ export default function CookiesPage() {
                     Ces cookies sont nécessaires au fonctionnement du site et ne peuvent pas être désactivés.
                   </p>
                   <ul className="space-y-1 ml-4 text-sm">
-                    <li>• Gestion de la session utilisateur</li>
+                    <li>• Gestion de la user utilisateur</li>
                     <li>• Sécurité et authentification</li>
                     <li>• Fonctionnalités de base du site</li>
                     <li>• Panier d'achat</li>
@@ -291,7 +291,7 @@ export default function CookiesPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-white mb-3">Cookies de session</h4>
+                    <h4 className="font-semibold text-white mb-3">Cookies de user</h4>
                     <p className="text-sm">
                       Supprimés automatiquement à la fermeture du navigateur.
                     </p>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 
 interface PaymentSecurityProps {
   onValidationChange: (isValid: boolean) => void
@@ -14,13 +14,13 @@ interface SecurityCheck {
 }
 
 export function PaymentSecurity({ onValidationChange, children }: PaymentSecurityProps) {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const [securityChecks, setSecurityChecks] = useState<SecurityCheck[]>([])
   const [isValid, setIsValid] = useState(false)
 
-  // Vérifier la session utilisateur
+  // Vérifier la user utilisateur
   const checkUserSession = useCallback((): SecurityCheck => {
-    if (!session?.user) {
+    if (!user) {
       return {
         isValid: false,
         message: 'Session utilisateur invalide'
@@ -30,7 +30,7 @@ export function PaymentSecurity({ onValidationChange, children }: PaymentSecurit
       isValid: true,
       message: 'Session utilisateur valide'
     }
-  }, [session])
+  }, [user])
 
   // Vérifier la sécurité du navigateur
   const checkBrowserSecurity = useCallback((): SecurityCheck => {
@@ -155,10 +155,10 @@ export function PaymentSecurity({ onValidationChange, children }: PaymentSecurit
     return () => clearInterval(interval)
   }, [performSecurityChecks])
 
-  // Re-vérifier lors des changements de session
+  // Re-vérifier lors des changements de user
   useEffect(() => {
     performSecurityChecks()
-  }, [session, performSecurityChecks])
+  }, [user, performSecurityChecks])
 
   return (
     <div className="relative">

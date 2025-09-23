@@ -132,7 +132,7 @@ export function RecentOrders() {
                       <p className="font-medium text-gray-900">{order.orderNumber}</p>
                       {getStatusBadge(order.status)}
                     </div>
-                    <p className="text-sm text-gray-600">{order.user.name}</p>
+                    <p className="text-sm text-gray-600">{order.user?.name}</p>
                     <p className="text-xs text-gray-500">{formatDateTime(new Date(order.createdAt))}</p>
                   </div>
                 </div>

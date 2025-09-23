@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -56,7 +56,7 @@ interface StockReport {
 }
 
 export default function StockSettingsPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [settings, setSettings] = useState<StockSettings>({
     lowStockThreshold: 10,
@@ -66,24 +66,24 @@ export default function StockSettingsPage() {
     emailAlerts: true,
     alertFrequency: 'daily'
   })
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [stockData, setStockData] = useState<any>(null)
   const [report, setReport] = useState<StockReport | null>(null)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
 
     fetchStockSettings()
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const fetchStockSettings = async () => {
     try {
@@ -96,7 +96,7 @@ export default function StockSettingsPage() {
       console.error('Erreur lors du chargement des paramètres:', error)
       toast.error('Erreur lors du chargement des paramètres')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 
@@ -184,7 +184,7 @@ export default function StockSettingsPage() {
     document.body.removeChild(a)
   }
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />

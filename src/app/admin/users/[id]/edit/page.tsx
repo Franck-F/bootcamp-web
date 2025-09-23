@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter, useParams } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -40,13 +40,13 @@ interface User {
 }
 
 export default function EditUserPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const params = useParams()
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const [userData, setUserData] = useState<User | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -62,12 +62,12 @@ export default function EditUserPage() {
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!userData) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
@@ -75,21 +75,21 @@ export default function EditUserPage() {
     if (params.id) {
       fetchUser()
     }
-  }, [session, status, router, params.id])
+  }, [user, loading, router, params.id])
 
   const fetchUser = async () => {
     try {
       const response = await fetch(`/api/admin/users/${params.id}`)
       if (response.ok) {
         const data = await response.json()
-        setUser(data.user)
+        setUserData(data.userData)
         setFormData({
-          name: data.user.name,
-          email: data.user.email,
+          name: data.user?.name,
+          email: data.user?.email,
           password: '',
           role: data.user.role,
           is_active: data.user.is_active,
-          email_verified: data.user.email_verified,
+          email_verified: data.user?.email_verified,
           phone: data.user.phone || '',
           address: data.user.address || '',
           city: data.user.city || '',
@@ -105,7 +105,7 @@ export default function EditUserPage() {
       toast.error('Erreur lors du chargement de l\'utilisateur')
       router.push('/admin/users')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 
@@ -191,7 +191,7 @@ export default function EditUserPage() {
     }
   }
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />
@@ -206,7 +206,7 @@ export default function EditUserPage() {
     )
   }
 
-  if (!user) {
+  if (!userData) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />
@@ -237,7 +237,7 @@ export default function EditUserPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Modifier l'Utilisateur</h1>
-            <p className="text-gray-400">Modifiez les informations de {user.name}</p>
+            <p className="text-gray-400">Modifiez les informations de {userData?.name || 'l\'utilisateur'}</p>
           </div>
           
           <Button
@@ -442,7 +442,7 @@ export default function EditUserPage() {
           </Card>
 
           {/* Avertissement pour les changements de rôle */}
-          {formData.role !== user.role && (
+          {formData.role !== userData?.role && (
             <Card className="bg-yellow-900 border-yellow-800">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-3">
@@ -450,7 +450,7 @@ export default function EditUserPage() {
                   <div>
                     <p className="text-white font-medium">Changement de rôle</p>
                     <p className="text-yellow-200 text-sm">
-                      Vous êtes sur le point de changer le rôle de {user.name} de "{user.role}" vers "{formData.role}".
+                      Vous êtes sur le point de changer le rôle de {userData?.name} de "{userData?.role}" vers "{formData.role}".
                       Cette action peut affecter les permissions de l'utilisateur.
                     </p>
                   </div>

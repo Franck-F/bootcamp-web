@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -49,9 +49,9 @@ interface Image {
 }
 
 export default function NewProductPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
   const [brands, setBrands] = useState<Brand[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [variants, setVariants] = useState<Variant[]>([
@@ -73,18 +73,20 @@ export default function NewProductPage() {
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (loading) return
+
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
 
     fetchBrandsAndCategories()
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const fetchBrandsAndCategories = async () => {
     try {
@@ -170,7 +172,7 @@ export default function NewProductPage() {
       return
     }
 
-    setLoading(true)
+    setPageLoading(true)
     try {
       const response = await fetch('/api/admin/products/create', {
         method: 'POST',
@@ -198,7 +200,7 @@ export default function NewProductPage() {
       console.error('Erreur lors de la création:', error)
       toast.error('Erreur lors de la création du produit')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 

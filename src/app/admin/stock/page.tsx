@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -50,29 +50,29 @@ interface StockSummary {
 }
 
 export default function AdminStockPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [variants, setVariants] = useState<StockVariant[]>([])
   const [summary, setSummary] = useState<StockSummary | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [editingStock, setEditingStock] = useState<{ [key: number]: number }>({})
   const [bulkUpdates, setBulkUpdates] = useState<Array<{ variantId: number; stock: number }>>([])
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
 
-    if (session?.user?.role !== 'admin') {
+    if (user?.role !== 'admin') {
       router.push('/')
       return
     }
 
     fetchStockData()
-  }, [session, status, router])
+  }, [user, loading, router])
 
   const fetchStockData = async () => {
     try {
@@ -86,7 +86,7 @@ export default function AdminStockPage() {
       console.error('Erreur lors du chargement du stock:', error)
       toast.error('Erreur lors du chargement du stock')
     } finally {
-      setLoading(false)
+      setPageLoading(false)
     }
   }
 
@@ -217,7 +217,7 @@ export default function AdminStockPage() {
     return matchesSearch && matchesStatus
   })
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="min-h-screen bg-black">
         <Navigation />
