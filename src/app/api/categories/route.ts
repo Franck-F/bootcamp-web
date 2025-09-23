@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export const runtime = 'edge'
+export const runtime = 'edge' // Cloudflare Pages compatible
 
 export async function GET(request: NextRequest) {
   try {
