@@ -486,15 +486,34 @@ export default function BackofficePage() {
                     <CardTitle className="text-white">Actions Rapides</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <Button onClick={handleNewProduct} className="w-full bg-red-600 hover:bg-red-700 justify-start">
+                    <Button 
+                      onClick={() => router.push('/admin/products/new')} 
+                      className="w-full bg-orange-600 hover:bg-orange-700 justify-start"
+                    >
                       <Plus className="w-4 h-4 mr-2" />
-                      Ajouter un produit
+                      Nouveau produit
                     </Button>
-                    <Button onClick={handleRefreshStock} variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 justify-start">
+                    <Button 
+                      onClick={() => router.push('/admin/products')} 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 justify-start"
+                    >
+                      <Package className="w-4 h-4 mr-2" />
+                      Gestion produits
+                    </Button>
+                    <Button 
+                      onClick={() => router.push('/admin/stock')} 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 justify-start"
+                    >
                       <RefreshCw className="w-4 h-4 mr-2" />
-                      Actualiser le stock
+                      Gestion stock
                     </Button>
-                    <Button onClick={handleStockSettings} variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 justify-start">
+                    <Button 
+                      onClick={() => router.push('/admin/stock/settings')} 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 justify-start"
+                    >
                       <Settings className="w-4 h-4 mr-2" />
                       Paramètres stock
                     </Button>
