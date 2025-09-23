@@ -112,3 +112,4 @@ npm run dev
 ## 🎉 Résultat
 
 Le projet est maintenant entièrement migré vers Edge Runtime et prêt pour le déploiement sur Cloudflare Pages. Toutes les fonctionnalités d'authentification sont préservées et le système est plus performant et sécurisé.
+

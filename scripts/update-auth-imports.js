@@ -66,3 +66,4 @@ allFiles.forEach(file => {
 });
 
 console.log(`\n🎉 Mise à jour terminée ! ${updatedCount} fichiers modifiés.`);
+
