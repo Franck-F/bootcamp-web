@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
@@ -59,7 +59,7 @@ interface Order {
   }>
 }
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
@@ -344,5 +344,13 @@ export default function CheckoutSuccessPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <CheckoutSuccessPageContent />
+    </Suspense>
   )
 }

@@ -73,12 +73,7 @@ interface Product {
     stock: number
     sku?: string
   }>
-  product_images: Array<{
-    id: number
-    image_url: string
-    alt_text?: string
-    is_primary: boolean
-  }>
+  images: string[]
 }
 
 export default function ProductPage() {
@@ -191,7 +186,7 @@ export default function ProductPage() {
           name: product.name,
           brand: product.brands.name,
           price: selectedVariant.price,
-          images: product.product_images.map(img => img.image_url),
+          images: product.images,
           availableStock: selectedVariant.stock,
           category: product.categories.name
         }
@@ -328,7 +323,7 @@ export default function ProductPage() {
               <div className="relative group">
                 <div className="aspect-square bg-white rounded-xl overflow-hidden shadow-lg">
                   <Image
-                    src={product.product_images[selectedImage]?.image_url || '/placeholder-sneaker.jpg'}
+                    src={product.images[selectedImage] || '/placeholder-sneaker.jpg'}
                     alt={product.name}
                     width={600}
                     height={600}
@@ -341,11 +336,11 @@ export default function ProductPage() {
               </div>
 
               {/* Miniatures */}
-              {product.product_images.length > 1 && (
+              {product.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-3">
-                  {product.product_images.map((image, index) => (
+                  {product.images.map((image, index) => (
                     <div
-                      key={image.id}
+                      key={index}
                       className={`aspect-square bg-white rounded-lg overflow-hidden cursor-pointer border-2 transition-all shadow-sm ${
                         selectedImage === index 
                           ? 'border-orange-500 ring-2 ring-orange-500/20' 
@@ -354,8 +349,8 @@ export default function ProductPage() {
                       onClick={() => setSelectedImage(index)}
                     >
                       <Image
-                        src={image.image_url}
-                        alt={image.alt_text || product.name}
+                        src={image}
+                        alt={product.name}
                         width={150}
                         height={150}
                         className="w-full h-full object-contain p-2"

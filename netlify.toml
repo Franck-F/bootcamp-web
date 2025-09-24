@@ -1,0 +1,41 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+# Redirections pour Next.js
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirections pour les pages dynamiques
+[[redirects]]
+  from = "/products/*"
+  to = "/products/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/admin/users/*"
+  to = "/admin/users/:splat"
+  status = 200
+
+# Redirection pour les assets statiques
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/_next/static/:splat"
+  status = 200
+
+# Redirection pour les images
+[[redirects]]
+  from = "/images/*"
+  to = "/images/:splat"
+  status = 200
+
+# Variables d'environnement (à configurer dans le dashboard Netlify)
+# DATABASE_URL = "votre-url-de-base-de-donnees"
+# EDGE_AUTH_SECRET = "votre-secret-jwt"
+# NEXT_PUBLIC_APP_URL = "https://votre-domaine.netlify.app"

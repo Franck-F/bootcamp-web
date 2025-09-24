@@ -50,12 +50,7 @@ interface Product {
     price: number
     stock: number
   }>
-  product_images: Array<{
-    id: number
-    image_url: string
-    alt_text?: string
-    is_primary: boolean
-  }>
+  images: string[]
 }
 
 export default function HommePage() {

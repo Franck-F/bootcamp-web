@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createToken } from '@/lib/edge-auth'
 
-export const runtime = 'edge'
+// export const runtime = 'edge' // Temporairement désactivé pour Prisma
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {

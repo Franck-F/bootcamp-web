@@ -302,7 +302,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: product.name,
           brand: product.brands?.name || 'Marque inconnue',
           price: product.price,
-          images: product.product_images?.map((img: any) => img.image_url) || [],
+          images: product.images || [],
           availableStock: product.variants?.reduce((total: number, variant: any) => total + variant.stock, 0) || 0,
           category: product.categories?.name
         }

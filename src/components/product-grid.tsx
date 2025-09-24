@@ -40,12 +40,7 @@ interface Product {
     price: number
     stock: number
   }>
-  product_images: Array<{
-    id: number
-    image_url: string
-    alt_text?: string
-    is_primary: boolean
-  }>
+  images: string[]
 }
 
 interface ProductGridProps {
@@ -181,7 +176,7 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
                 <div className="w-48 h-48 relative flex-shrink-0 bg-white rounded-l-lg overflow-hidden">
                   <Link href={`/products/${product.id}`}>
                     <Image
-                      src={product.product_images[0]?.image_url || '/images/placeholder-sneaker.jpg'}
+                      src={product.images?.[0] || '/images/placeholder-sneaker.jpg'}
                       alt={product.name}
                       fill
                       className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
@@ -299,7 +294,7 @@ export function ProductGrid({ products, loading, viewMode }: ProductGridProps) {
               <Link href={`/products/${product.id}`}>
                 <div className="aspect-square relative bg-white">
                   <Image
-                    src={product.product_images[0]?.image_url || '/images/placeholder-sneaker.jpg'}
+                    src={product.images?.[0] || '/images/placeholder-sneaker.jpg'}
                     alt={product.name}
                     fill
                     className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"

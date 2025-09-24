@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { ProductGrid } from '@/components/product-grid'
@@ -50,15 +50,10 @@ interface Product {
     price: number
     stock: number
   }>
-  product_images: Array<{
-    id: number
-    image_url: string
-    alt_text?: string
-    is_primary: boolean
-  }>
+  images: string[]
 }
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -341,5 +336,13 @@ export default function ProductsPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <ProductsPageContent />
+    </Suspense>
   )
 }

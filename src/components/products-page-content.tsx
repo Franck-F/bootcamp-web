@@ -49,12 +49,7 @@ interface Product {
     stock: number
     sku?: string
   }>
-  product_images: Array<{
-    id: number
-    image_url: string
-    alt_text?: string
-    is_primary: boolean
-  }>
+  images: string[]
 }
 
 export function ProductsPageContent() {
