@@ -91,11 +91,11 @@ npx prisma db push
 ## Sécurité
 
 ### Bonnes Pratiques
-- ✅ Ne jamais commiter les fichiers `.env*`
-- ✅ Utiliser des secrets forts pour `NEXTAUTH_SECRET`
-- ✅ Limiter l'accès aux variables d'environnement
-- ✅ Utiliser des URLs HTTPS en production
-- ✅ Rotation régulière des secrets
+-  Ne jamais commiter les fichiers `.env*`
+-  Utiliser des secrets forts pour `NEXTAUTH_SECRET`
+-  Limiter l'accès aux variables d'environnement
+-  Utiliser des URLs HTTPS en production
+-  Rotation régulière des secrets
 
 ### Fichiers à Ignorer
 ```gitignore
