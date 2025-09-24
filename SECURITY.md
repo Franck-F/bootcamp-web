@@ -2,7 +2,7 @@
 
 Ce document décrit les mesures de sécurité mises en place pour protéger le système de paiement de l'application SneakPeak.
 
-## 🔒 Mesures de Sécurité Implémentées
+## Mesures de Sécurité Implémentées
 
 ### 1. Authentification et Autorisation
 
@@ -81,7 +81,7 @@ Ce document décrit les mesures de sécurité mises en place pour protéger le s
 - **Retry automatique** : Tentatives de récupération
 - **Notifications** : Alertes en cas d'activité suspecte
 
-## 🛡️ Bonnes Pratiques Implémentées
+##  Bonnes Pratiques Implémentées
 
 ### 1. Principe du Moindre Privilège
 - Accès minimal nécessaire pour chaque fonction
@@ -113,7 +113,7 @@ Les headers de sécurité sont automatiquement ajoutés par le middleware.
 ### Certificats SSL
 HTTPS est obligatoire en production pour toutes les transactions.
 
-## 📊 Monitoring et Alertes
+##  Monitoring et Alertes
 
 ### Métriques Surveillées
 - Nombre de tentatives de paiement par IP
@@ -127,7 +127,7 @@ HTTPS est obligatoire en production pour toutes les transactions.
 - Erreurs de validation répétées
 - Activité de bot détectée
 
-## 🚨 Réponse aux Incidents
+##  Réponse aux Incidents
 
 ### En Cas d'Attaque
 1. **Isolation** : Blocage immédiat de l'IP suspecte
@@ -141,7 +141,7 @@ HTTPS est obligatoire en production pour toutes les transactions.
 3. **Renforcement** : Mise à jour des mesures de sécurité
 4. **Communication** : Information des utilisateurs si nécessaire
 
-## 📋 Checklist de Sécurité
+##  Checklist de Sécurité
 
 ### Avant Déploiement
 - [ ] Variables d'environnement configurées
@@ -163,7 +163,7 @@ HTTPS est obligatoire en production pour toutes les transactions.
 - [ ] Test des procédures de récupération
 - [ ] Formation de l'équipe
 
-## 📞 Support Sécurité
+##  Support Sécurité
 
 Pour toute question ou incident de sécurité :
 - **Email** : security@sneakpeak.com
@@ -171,6 +171,4 @@ Pour toute question ou incident de sécurité :
 - **Documentation** : Ce fichier et les logs système
 
 ---
-
-*Dernière mise à jour : ${new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })}*
 *Version : 1.0*
