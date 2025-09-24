@@ -1,0 +1,17 @@
+# Redirections pour Cloudflare Pages
+
+# Redirections pour les pages dynamiques
+/products/* /products/:splat 200
+/admin/users/* /admin/users/:splat 200
+
+# Redirections pour les API
+/api/* /api/:splat 200
+
+# Redirection pour les assets Next.js
+/_next/static/* /_next/static/:splat 200
+
+# Redirection pour les images
+/images/* /images/:splat 200
+
+# Redirection par défaut
+/* /:splat 200
