@@ -1,7 +1,8 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import { Package } from 'lucide-react'
 import { Navigation } from '@/components/navigation'

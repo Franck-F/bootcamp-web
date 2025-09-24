@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 
 export interface WishlistItem {
   id: number

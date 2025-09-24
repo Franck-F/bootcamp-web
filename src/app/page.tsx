@@ -5,6 +5,7 @@ import { CategoriesSectionNew } from '@/components/categories-section-new'
 import { NewsletterSectionNew } from '@/components/newsletter-section-new'
 import { Footer } from '@/components/footer'
 
+export const dynamic = 'force-dynamic'
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-black">

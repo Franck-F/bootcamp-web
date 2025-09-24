@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 
 interface PaymentSecurityProps {
   onValidationChange: (isValid: boolean) => void

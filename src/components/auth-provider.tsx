@@ -11,7 +11,7 @@ interface AuthContextType {
   refresh: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
@@ -90,17 +90,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
 
 // Hook de compatibilité avec NextAuth
 export function useSession() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useContext(AuthContext) || { user: null, loading: false }
   
   return {
     data: user ? { user } : null,

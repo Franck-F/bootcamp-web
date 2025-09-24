@@ -1,7 +1,8 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
 import { useWishlist } from '@/store/wishlist-context'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 import { toast } from 'react-hot-toast'
 
 interface WishlistButtonProps {

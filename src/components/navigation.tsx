@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useAuth } from '@/components/auth-provider'
+import { useAuth } from '@/hooks/use-auth'
 import { useCart } from '@/store/cart-context'
 import { useWishlist } from '@/store/wishlist-context'
 import { Button } from '@/components/ui/button'

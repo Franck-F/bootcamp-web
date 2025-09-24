@@ -1,5 +1,6 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { Navigation } from '@/components/navigation'
 import { ProductGrid } from '@/components/product-grid'
