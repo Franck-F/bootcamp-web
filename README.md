@@ -204,11 +204,11 @@ npm run type-check   # Vérification TypeScript
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 👨‍💻 **Auteur**
+##  **Auteur**
 
 **Franck-F** - [GitHub](https://github.com/Franck-F)
 
-## 🙏 **Remerciements**
+##  **Remerciements**
 
 - [Next.js](https://nextjs.org/) pour le framework
 - [Tailwind CSS](https://tailwindcss.com/) pour le styling
