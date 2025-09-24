@@ -1,10 +1,10 @@
-# 🚀 SneakPeak - E-commerce de Sneakers Moderne
+#  SneakPeak - E-commerce de Sneakers Moderne
 
 Un site e-commerce moderne et professionnel pour une boutique de sneakers, développé avec Next.js 14, TypeScript, et Prisma.
 
-## ✨ Fonctionnalités
+##  Fonctionnalités
 
-### 🛍️ **E-commerce Complet**
+###  **E-commerce Complet**
 - **Catalogue de produits** avec filtres avancés (catégorie, marque, prix, taille)
 - **Recherche intelligente** avec autocomplétion en temps réel
 - **Pages dédiées** : Homme, Femme, Enfant, Nouveautés, Soldes
@@ -12,34 +12,34 @@ Un site e-commerce moderne et professionnel pour une boutique de sneakers, déve
 - **Processus de commande** complet avec paiement fictif
 - **Suivi des commandes** et historique
 
-### 👥 **Gestion des Utilisateurs**
+###  **Gestion des Utilisateurs**
 - **Authentification sécurisée** avec NextAuth.js
 - **3 rôles** : Administrateur, Vendeur, Client
 - **Profils utilisateurs** avec gestion des informations
 - **Système de permissions** granulaire
 
-### 📊 **Administration Avancée**
+###  **Administration Avancée**
 - **Backoffice moderne** pour la gestion des stocks
 - **Tableau de bord** avec KPIs en temps réel
 - **Gestion des produits** (CRUD complet)
 - **Gestion des utilisateurs** et des commandes
 - **Analytiques** et rapports de vente
 
-### 🎨 **Interface Moderne**
+###  **Interface Moderne**
 - **Design sombre** et élégant
 - **Responsive** sur tous les appareils
 - **Animations fluides** et transitions
 - **Thème clair/sombre** avec persistance
 - **UX optimisée** avec feedback visuel
 
-### 🔒 **Sécurité & Conformité**
+###  **Sécurité & Conformité**
 - **Conformité RGPD** avec bannière de cookies
 - **Pages légales** complètes (Confidentialité, CGV, etc.)
 - **Validation des données** côté client et serveur
 - **Protection CSRF** et sécurisation des sessions
 - **Chiffrement des mots de passe** avec bcrypt
 
-## 🛠️ **Stack Technique**
+##  **Stack Technique**
 
 ### **Frontend**
 - **Next.js 14** (App Router)
@@ -60,7 +60,7 @@ Un site e-commerce moderne et professionnel pour une boutique de sneakers, déve
 - **Vercel** pour le déploiement
 - **GitHub** pour le versioning
 
-## 🚀 **Installation & Démarrage**
+##  **Installation & Démarrage**
 
 ### **Prérequis**
 - Node.js 18+ 
@@ -116,7 +116,7 @@ npm run dev
 
 Le site sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-## 📁 **Structure du Projet**
+##  **Structure du Projet**
 
 ```
 src/
@@ -135,7 +135,7 @@ src/
 └── types/                 # Types TypeScript
 ```
 
-## 🎯 **Fonctionnalités Clés**
+##  **Fonctionnalités Clés**
 
 ### **Recherche Avancée**
 - Autocomplétion en temps réel
@@ -155,7 +155,7 @@ src/
 - Paiement fictif sécurisé
 - Confirmation par email (simulation)
 
-## 🌐 **Déploiement sur Vercel**
+##  **Déploiement sur Vercel**
 
 ### **1. Connecter le repository**
 1. Aller sur [Vercel](https://vercel.com)
@@ -171,7 +171,7 @@ Dans Vercel, ajouter les variables :
 ### **3. Déploiement automatique**
 Vercel déploiera automatiquement à chaque push sur la branche `main`.
 
-## 📊 **Base de Données**
+##  **Base de Données**
 
 Le projet utilise Prisma avec PostgreSQL. Le schéma inclut :
 
@@ -200,7 +200,7 @@ npm run type-check   # Vérification TypeScript
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
-## 📄 **Licence**
+##  **Licence**
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
@@ -218,4 +218,4 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ---
 
-⭐ **N'hésitez pas à donner une étoile si ce projet vous a aidé !**
+ **N'hésitez pas à donner une étoile si ce projet vous a aidé !**
